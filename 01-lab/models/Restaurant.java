@@ -23,23 +23,35 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+    
+    public void reserveTable(int number, String reservationName, int timeout) {
+        if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e) {
 
-    public boolean reserveTable(int number, String reservationName) {
-        if (tableReservations.get(number) == null) {
+            }
+
             tableReservations.put(number, reservationName);
-            return true;
+
+            System.out.println("Reserved table number " + number + " for " + reservationName);
+            return;
         }
 
-        return false;
+        System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
     }
 
     public void printAvailability() {
+        System.out.println("\nPrinting restaurant availability:");
+
         for (var entry: tableReservations.entrySet()) {
             System.out.print("Table number " + entry.getKey() + ": ");
 
             String reservationName = entry.getValue();
-            if (reservationName != null) System.out.println("is reserved by " + reservationName);
-            else System.out.println("is available");
+            if (reservationName != null)
+                System.out.println("is reserved by " + reservationName);
+            else
+                System.out.println("is available");
         }
     }
 }
