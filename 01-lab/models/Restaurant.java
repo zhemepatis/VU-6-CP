@@ -66,7 +66,6 @@ public class Restaurant {
                 tableReservations.put(number, reservationName);
                 return true;
             }
-    
         }
 
         return false;
