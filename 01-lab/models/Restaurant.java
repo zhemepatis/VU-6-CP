@@ -3,6 +3,8 @@ package models;
 import java.util.HashMap;
 import java.util.Map;
 
+import utils.RestaurantPrinter;
+
 public class Restaurant {
     private String name;
     private Map<Integer, String> tableReservations;
@@ -31,7 +33,7 @@ public class Restaurant {
         else
             reservationSuccess = addEntryNoLock(number, reservationName, timeout);
         
-        printReservationStatus(number, reservationName, reservationSuccess);
+        RestaurantPrinter.printReservationStatus(number, reservationName, reservationSuccess);
     }
 
     private boolean addEntryNoLock(int number, String reservationName, int timeout) {
@@ -67,24 +69,7 @@ public class Restaurant {
         return false;
     }
 
-    private void printReservationStatus(int number, String reservationName, boolean success) {
-        if (success)
-            System.out.println("Reserved table number " + number + " for " + reservationName);
-        else
-            System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
-    }
-
     public void printAvailability() {
-        System.out.println("\nPrinting restaurant availability:");
-
-        for (var entry: tableReservations.entrySet()) {
-            System.out.print("Table number " + entry.getKey() + ": ");
-
-            String reservationName = entry.getValue();
-            if (reservationName != null)
-                System.out.println("is reserved by " + reservationName);
-            else
-                System.out.println("is available");
-        }
+        RestaurantPrinter.printAvailability(tableReservations);
     }
 }

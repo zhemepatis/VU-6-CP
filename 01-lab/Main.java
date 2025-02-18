@@ -2,7 +2,7 @@ import models.Restaurant;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        boolean useLock = true;
+        boolean useLock = false;
         Restaurant restaurant = new Restaurant("Gusteu's", 3);
 
         // creating and starting threads
