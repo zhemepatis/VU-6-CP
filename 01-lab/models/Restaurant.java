@@ -1,3 +1,6 @@
+// Gabrielė Rinkevičiūtė, Informatika 3 k., 2 g.
+// Restorano modelis, skirtas apibrėžti restorano staliukų rezervavimo logiką.
+
 package models;
 
 import java.util.HashMap;

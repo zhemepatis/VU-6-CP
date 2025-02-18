@@ -1,3 +1,7 @@
+// Gabrielė Rinkevičiūtė, Informatika 3 k., 2 g.
+// Pradinė funkcija, modeliuojanti situaciją,
+// kai 2 žmonės nori užsirezervuoti tą patį staliuką.
+
 import models.Restaurant;
 
 public class Main {
