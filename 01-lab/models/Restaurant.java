@@ -25,35 +25,16 @@ public class Restaurant {
     }
 
     public void reserveTable(int number, String reservationName, int timeout, boolean useLock) {
-        if (!useLock) {
-            reserveTable(number, reservationName, timeout);
-            return;
-        }
-
-        boolean reservationSuccess = false;
-
-        synchronized (tableReservations) {  // KS prasideda
-            if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
-                try {
-                    Thread.sleep(timeout);
-                } catch (InterruptedException e) {
-    
-                }
-    
-                tableReservations.put(number, reservationName);
-                reservationSuccess = true;
-            }
-        }   // KS pasibaigia
-
-        if (reservationSuccess)
-            System.out.println("Reserved table number " + number + " for " + reservationName);
+        boolean reservationSuccess;
+        if (useLock)
+            reservationSuccess = addEntryWithLock(number, reservationName, timeout);
         else
-            System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
+            reservationSuccess = addEntryNoLock(number, reservationName, timeout);
+        
+        printReservationStatus(number, reservationName, reservationSuccess);
     }
 
-    private void reserveTable(int number, String reservationName, int timeout) {
-        boolean reservationSuccess = false;
-
+    private boolean addEntryNoLock(int number, String reservationName, int timeout) {
         if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
             try {
                 Thread.sleep(timeout);
@@ -62,10 +43,32 @@ public class Restaurant {
             }
 
             tableReservations.put(number, reservationName);
-            reservationSuccess = true;
+            return true;
         }
 
-        if (reservationSuccess)
+        return false;
+    }
+
+    private boolean addEntryWithLock(int number, String reservationName, int timeout) {
+        synchronized (tableReservations) {
+            if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
+                try {
+                    Thread.sleep(timeout);
+                } catch (InterruptedException e) {
+    
+                }
+    
+                tableReservations.put(number, reservationName);
+                return true;
+            }
+    
+        }
+
+        return false;
+    }
+
+    private void printReservationStatus(int number, String reservationName, boolean success) {
+        if (success)
             System.out.println("Reserved table number " + number + " for " + reservationName);
         else
             System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
