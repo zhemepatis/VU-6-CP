@@ -23,8 +23,37 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+
+    public void reserveTable(int number, String reservationName, int timeout, boolean useLock) {
+        if (!useLock) {
+            reserveTable(number, reservationName, timeout);
+            return;
+        }
+
+        boolean reservationSuccess = false;
+
+        synchronized (tableReservations) {  // KS prasideda
+            if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
+                try {
+                    Thread.sleep(timeout);
+                } catch (InterruptedException e) {
     
-    public void reserveTable(int number, String reservationName, int timeout) {
+                }
+    
+                tableReservations.put(number, reservationName);
+                reservationSuccess = true;
+            }
+        }   // KS pasibaigia
+
+        if (reservationSuccess)
+            System.out.println("Reserved table number " + number + " for " + reservationName);
+        else
+            System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
+    }
+
+    private void reserveTable(int number, String reservationName, int timeout) {
+        boolean reservationSuccess = false;
+
         if (tableReservations.containsKey(number) && tableReservations.get(number) == null) {
             try {
                 Thread.sleep(timeout);
@@ -33,12 +62,13 @@ public class Restaurant {
             }
 
             tableReservations.put(number, reservationName);
-
-            System.out.println("Reserved table number " + number + " for " + reservationName);
-            return;
+            reservationSuccess = true;
         }
 
-        System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
+        if (reservationSuccess)
+            System.out.println("Reserved table number " + number + " for " + reservationName);
+        else
+            System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
     }
 
     public void printAvailability() {

@@ -2,11 +2,12 @@ import models.Restaurant;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        boolean useLock = true;
         Restaurant restaurant = new Restaurant("Gusteu's", 3);
 
         // creating and starting threads
-        Thread thread1 = new Thread(() -> restaurant.reserveTable(2, "user 1", 5000));
-        Thread thread2 = new Thread(() -> restaurant.reserveTable(2, "user 2", 0));
+        Thread thread1 = new Thread(() -> restaurant.reserveTable(2, "user 1", 5000, useLock));
+        Thread thread2 = new Thread(() -> restaurant.reserveTable(2, "user 2", 0, useLock));
         thread1.start();
         thread2.start();
 
