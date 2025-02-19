@@ -3,7 +3,8 @@
 
 package utils;
 
-import java.util.Map;
+import java.util.*;
+import models.Reservation;
 
 public class RestaurantPrinter {
     public static void printReservationStatus(int number, String reservationName, boolean success) {
@@ -13,13 +14,15 @@ public class RestaurantPrinter {
             System.out.println("Couldn't reserve table number " + number + " for " + reservationName);
     }
 
-    public static void printAvailability(Map<Integer, String> tableReservations) {
+    public static void printAvailability(List<Reservation> tableReservations) {
         System.out.println("\nPrinting restaurant availability:");
+        int tableNum = tableReservations.size();
 
-        for (var entry: tableReservations.entrySet()) {
-            System.out.print("Table number " + entry.getKey() + ": ");
+        for (int i = 0; i < tableNum; ++i) {
+            System.out.print("Table number " + (i + 1) + ": ");
 
-            String reservationName = entry.getValue();
+            Reservation reservation = tableReservations.get(i);
+            String reservationName = reservation.getReservationName();
             if (reservationName != null)
                 System.out.println("is reserved by " + reservationName);
             else
