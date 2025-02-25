@@ -8,15 +8,14 @@ import utils.TableReservationTask;
 public class Main {
     public static void main(String[] args) throws Exception {
         // setting demonstration options
-        boolean useLock = false;
+        boolean useLock = true;
         int restaurantTableNum = 100000;
-        int threadTableTarget = restaurantTableNum / 2;
 
         Restaurant restaurant = new Restaurant("Gusteu's", restaurantTableNum);
 
         // creating and starting threads
-        TableReservationTask task1 = new TableReservationTask(restaurant, "Thread1", threadTableTarget, useLock);
-        TableReservationTask task2 = new TableReservationTask(restaurant, "Thread2", threadTableTarget, useLock);
+        TableReservationTask task1 = new TableReservationTask(restaurant, "Thread1", useLock);
+        TableReservationTask task2 = new TableReservationTask(restaurant, "Thread2", useLock);
         Thread thread1 = new Thread(task1);
         Thread thread2 = new Thread(task2);
 

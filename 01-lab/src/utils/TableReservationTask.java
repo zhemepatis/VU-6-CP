@@ -5,15 +5,13 @@ import models.Restaurant;
 public class TableReservationTask implements Runnable {
     private Restaurant restaurant;
     private String reservationName;
-    private int tableTarget;
     private boolean useLock;
     private int lastReservedTableNum;
     private int reservedTablesNum;
 
-    public TableReservationTask(Restaurant restaurant, String reservationName, int tableTarget, boolean useLock) {
+    public TableReservationTask(Restaurant restaurant, String reservationName, boolean useLock) {
         this.restaurant = restaurant;
         this.reservationName = reservationName;
-        this.tableTarget = tableTarget;
         this.useLock = useLock;
     }
     
@@ -21,20 +19,17 @@ public class TableReservationTask implements Runnable {
     public void run() {
         int restaurantTableNum = restaurant.getTableNum();
         int currTable = 1;
-        int reservedTables = 0;
 
-        while (reservedTables < tableTarget && currTable <= restaurantTableNum) {
+        while (currTable <= restaurantTableNum) {
             boolean reservationSuccess = restaurant.reserveTable(currTable, reservationName, useLock);
 
             if (reservationSuccess) {
-                reservedTables++;
+                this.reservedTablesNum++;
+                this.lastReservedTableNum = currTable;
             }
 
             currTable++;
         }
-
-        this.lastReservedTableNum = currTable - 1;
-        this.reservedTablesNum = reservedTables;
     }
 
     public void printResults() {
