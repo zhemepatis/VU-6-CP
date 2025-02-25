@@ -4,7 +4,6 @@
 package models;
 
 import java.util.*;
-import models.Table;
 import utils.RestaurantPrinter;
 
 public class Restaurant {
@@ -50,7 +49,7 @@ public class Restaurant {
         int idx = number - 1;
         Table table = tables.get(idx);
 
-        if (!table.checkIfReserved()) {
+        if (!table.isReserved()) {
             table.reserve(reservationName);
             return true;
         }
@@ -63,10 +62,19 @@ public class Restaurant {
 
         synchronized (tables) {
             Table table = tables.get(idx);
-            if (!table.checkIfReserved()) {
+            if (!table.isReserved()) {
                 table.reserve(reservationName);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public boolean hasAvailableTable() {
+        for(Table table: tables) {
+            if(!table.isReserved())
+                return true;
         }
 
         return false;

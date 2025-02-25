@@ -13,7 +13,7 @@ public class Table {
         isReserved = true;
     }
 
-    public boolean checkIfReserved() {
+    public boolean isReserved() {
         return isReserved;
     }
 
