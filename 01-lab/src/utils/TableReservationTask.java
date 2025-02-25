@@ -21,20 +21,17 @@ public class TableReservationTask implements Runnable {
     public void run() {
         int restaurantTableNum = restaurant.getTableNum();
         int currTable = 1;
-        int reservedTables = 0;
 
-        while (reservedTables < tableTarget && currTable <= restaurantTableNum) {
+        while (this.reservedTablesNum < tableTarget && currTable <= restaurantTableNum) {
             boolean reservationSuccess = restaurant.reserveTable(currTable, reservationName, useLock);
 
             if (reservationSuccess) {
-                reservedTables++;
+                this.reservedTablesNum++;
+                this.lastReservedTableNum = currTable;
             }
 
             currTable++;
         }
-
-        this.lastReservedTableNum = currTable - 1;
-        this.reservedTablesNum = reservedTables;
     }
 
     public void printResults() {
