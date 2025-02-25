@@ -3,19 +3,19 @@
 
 package models;
 
-// import java.util.HashMap;
-// import java.util.Map;
 import java.util.*;
-import models.Reservation;
+import models.Table;
 import utils.RestaurantPrinter;
 
 public class Restaurant {
     private String name;
-    private List<Reservation> tableReservations;
+    private int tableNum;
+    private List<Table> tables;
 
     public Restaurant(String name, int tableNum) {
         this.name = name;
-        this.tableReservations = new ArrayList<Reservation>(tableNum + 1);
+        this.tableNum = tableNum;
+        this.tables = new ArrayList<Table>(tableNum + 1);
 
         initialiseTables(tableNum);
     }
@@ -23,15 +23,19 @@ public class Restaurant {
     public String getName() {
         return name;
     }
+    
+    public int getTableNum() {
+        return tableNum;
+    }
 
     private void initialiseTables(int tableNum) {
         for (var i = 0; i < tableNum; ++i) {
-            Reservation reservation = new Reservation(false);
-            tableReservations.add(i, reservation);
+            Table table = new Table();
+            tables.add(i, table);
         }
     }
 
-    public void reserveTable(int number, String reservationName, boolean useLock) {
+    public boolean reserveTable(int number, String reservationName, boolean useLock) {
         boolean reservationSuccess;
         if (useLock)
             reservationSuccess = addEntryWithLock(number, reservationName);
@@ -39,15 +43,15 @@ public class Restaurant {
             reservationSuccess = addEntryNoLock(number, reservationName);
         
         RestaurantPrinter.printReservationStatus(number, reservationName, reservationSuccess);
+        return reservationSuccess;
     }
 
     private boolean addEntryNoLock(int number, String reservationName) {
         int idx = number - 1;
-        Reservation reservation = tableReservations.get(idx);
-        if (!reservation.checkIfReserved()) {
-            reservation.makeReservation(reservationName);
-            tableReservations.set(idx, reservation);
+        Table table = tables.get(idx);
 
+        if (!table.checkIfReserved()) {
+            table.reserve(reservationName);
             return true;
         }
 
@@ -57,12 +61,10 @@ public class Restaurant {
     private boolean addEntryWithLock(int number, String reservationName) {
         int idx = number - 1;
 
-        synchronized (tableReservations) {
-            Reservation reservation = tableReservations.get(idx);
-            if (!reservation.checkIfReserved()) {
-                reservation.makeReservation(reservationName);
-                tableReservations.set(idx, reservation);
-    
+        synchronized (tables) {
+            Table table = tables.get(idx);
+            if (!table.checkIfReserved()) {
+                table.reserve(reservationName);
                 return true;
             }
         }
@@ -70,8 +72,7 @@ public class Restaurant {
         return false;
     }
 
-
     public void printAvailability() {
-        RestaurantPrinter.printAvailability(tableReservations);
+        RestaurantPrinter.printAvailability(tables);
     }
 }

@@ -1,14 +1,14 @@
 package models;
 
-public class Reservation {
-    private String reservationName;
+public class Table {
     private boolean isReserved;
+    private String reservationName;
 
-    public Reservation(boolean isReserved) {
-        this.isReserved = isReserved;
+    public Table() {
+        this.isReserved = false;
     }
 
-    public void makeReservation(String reservationName) {
+    public void reserve(String reservationName) {
         this.reservationName = reservationName;
         isReserved = true;
     }
