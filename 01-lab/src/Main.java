@@ -8,7 +8,7 @@ import utils.TableReservationTask;
 public class Main {
     public static void main(String[] args) throws Exception {
         // setting demonstration options
-        boolean useLock = true;
+        boolean useLock = false;
         int restaurantTableNum = 100000;
 
         Restaurant restaurant = new Restaurant("Gusteu's", restaurantTableNum);
@@ -27,7 +27,7 @@ public class Main {
         thread2.join();
         
         // printing results
-        restaurant.printAvailability();
+        // restaurant.printAvailability();
 
         task1.printResults();
         task2.printResults();
