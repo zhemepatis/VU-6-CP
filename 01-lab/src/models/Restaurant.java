@@ -41,7 +41,6 @@ public class Restaurant {
         else
             reservationSuccess = addEntryNoLock(number, reservationName);
         
-        RestaurantPrinter.printReservationStatus(number, reservationName, reservationSuccess);
         return reservationSuccess;
     }
 
@@ -60,8 +59,8 @@ public class Restaurant {
     private boolean addEntryWithLock(int number, String reservationName) {
         int idx = number - 1;
 
+        Table table = tables.get(idx);
         synchronized (tables) {
-            Table table = tables.get(idx);
             if (!table.isReserved()) {
                 table.reserve(reservationName);
                 return true;
