@@ -41,7 +41,6 @@ public class Restaurant {
         else
             reservationSuccess = addEntryNoLock(number, reservationName);
         
-        // RestaurantPrinter.printReservationStatus(number, reservationName, reservationSuccess);
         return reservationSuccess;
     }
 

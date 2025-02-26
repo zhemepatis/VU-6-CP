@@ -27,8 +27,6 @@ public class Main {
         thread2.join();
         
         // printing results
-        // restaurant.printAvailability();
-
         task1.printResults();
         task2.printResults();
 
