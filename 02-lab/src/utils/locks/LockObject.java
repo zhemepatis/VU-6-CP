@@ -1,20 +1,20 @@
 package utils.locks;
 
 // TODO: make locks sortable so that lock time would be shorter
-public class PartialLock {
+class LockObject {
     private int idxFrom;
     private int idxTo;
 
-    public PartialLock(int idxFrom, int idxTo) {
+    protected LockObject(int idxFrom, int idxTo) {
         this.idxFrom = idxFrom;
         this.idxTo = idxTo;
     }
 
-    public int getIdxFrom() {
+    protected int getIdxFrom() {
         return idxFrom;
     }
 
-    public int getIdxTo() {
+    protected int getIdxTo() {
         return idxTo;
     }
 }

@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import utils.ArrayUtils;
 
 public class ArrayLock<T> {
-    private List<PartialLock> locks;
+    private List<RangeLock> locks;
 
     public ArrayLock() {
-        this.locks = new ArrayList<PartialLock>();
+        this.locks = new ArrayList<RangeLock>();
     }
 
     public void lock(int idxFrom, int idxTo) throws InterruptedException {
         while (true) {
             boolean lockIsPermitted = true;
-            PartialLock currLock = null;    // TODO: change to something more making sense
+            RangeLock currLock = null;    // TODO: change to something more making sense
 
             synchronized (locks) {
-                for (PartialLock lock : locks) {
+                for (RangeLock lock : locks) {
                     currLock = lock;
                     int lockIdxFrom = currLock.getIdxFrom();
                     int lockIdxTo = currLock.getIdxTo();
@@ -30,7 +30,7 @@ public class ArrayLock<T> {
                 }
 
                 if (lockIsPermitted) {
-                    PartialLock newLock = new PartialLock(idxFrom, idxTo);
+                    RangeLock newLock = new RangeLock(idxFrom, idxTo);
                     locks.add(newLock);
                 }
             }
