@@ -6,8 +6,8 @@ public class TableReservationTask implements Runnable {
     private Restaurant restaurant;
     private String reservationName;
     private boolean useLock;
-    private int lastReservedTableNum;
-    private int reservedTablesNum;
+    private int lastReservedTable;
+    private int reservationCount;
 
     public TableReservationTask(Restaurant restaurant, String reservationName, boolean useLock) {
         this.restaurant = restaurant;
@@ -24,18 +24,19 @@ public class TableReservationTask implements Runnable {
             boolean reservationSuccess = restaurant.reserveTable(currTable, reservationName, useLock);
 
             if (reservationSuccess) {
-                this.reservedTablesNum++;
-                this.lastReservedTableNum = currTable;
+                this.reservationCount++;
+                this.lastReservedTable = currTable;
             }
 
             currTable++;
         }
     }
 
-    public void printResults() {
-        System.out.println();
-        System.out.println(reservationName + " results:");
-        System.out.println("Number of last reserved table: " + lastReservedTableNum);
-        System.out.println("Tables reserved: " + reservedTablesNum);
+    public int getReservationCount() {
+        return reservationCount;
+    }
+
+    public int getLastReservedTable() {
+        return lastReservedTable;
     }
 }
