@@ -20,11 +20,7 @@ public class TableReservationTask implements Runnable {
         int restaurantTableNum = restaurant.getTableNum();
         int currTable = 1;
 
-<<<<<<< HEAD
-        while (this.reservedTablesNum < tableTarget && currTable <= restaurantTableNum) {
-=======
         while (currTable <= restaurantTableNum) {
->>>>>>> no-table-target
             boolean reservationSuccess = restaurant.reserveTable(currTable, reservationName, useLock);
 
             if (reservationSuccess) {

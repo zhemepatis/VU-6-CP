@@ -1,6 +1,3 @@
-// Gabrielė Rinkevičiūtė, Informatika 3 k., 2 g.
-// Pagalbinė klasė, spausdinanti rezervavimo būsenas.
-
 package utils;
 
 import java.util.*;
