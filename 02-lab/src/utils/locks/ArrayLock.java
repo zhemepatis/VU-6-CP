@@ -5,41 +5,44 @@ import java.util.ArrayList;
 import utils.ArrayUtils;
 
 public class ArrayLock<T> {
-    private List<RangeLock> locks;
+    private List<LockObject> locks;
 
     public ArrayLock() {
-        this.locks = new ArrayList<RangeLock>();
+        this.locks = new ArrayList<LockObject>();
     }
 
     public void lock(int idxFrom, int idxTo) throws InterruptedException {
         while (true) {
-            boolean lockIsPermitted = true;
-            RangeLock currLock = null;    // TODO: change to something more making sense
+            LockObject conflictingLock;
 
             synchronized (locks) {
-                for (RangeLock lock : locks) {
-                    currLock = lock;
-                    int lockIdxFrom = currLock.getIdxFrom();
-                    int lockIdxTo = currLock.getIdxTo();
-                    
-                    if (ArrayUtils.isWithinRange(lockIdxFrom, lockIdxTo, idxTo) || 
-                        ArrayUtils.isWithinRange(lockIdxFrom, lockIdxTo, idxFrom)) {
-                        lockIsPermitted = false;
-                        break;
-                    }
-                }
+                conflictingLock = hasConflictingLock(idxFrom, idxTo);
 
-                if (lockIsPermitted) {
-                    RangeLock newLock = new RangeLock(idxFrom, idxTo);
+                if (conflictingLock == null) {
+                    LockObject newLock = new LockObject(idxFrom, idxTo);
                     locks.add(newLock);
                 }
             }
 
-            if (!lockIsPermitted)
-                currLock.wait();
+            if (conflictingLock != null)
+                conflictingLock.wait();
             else 
                 break;
         }
+    }
+
+    private LockObject hasConflictingLock(int idxFrom, int idxTo) {
+        for (LockObject lock : locks) {
+            int lockIdxFrom = lock.getIdxFrom();
+            int lockIdxTo = lock.getIdxTo();
+            
+            if (ArrayUtils.isWithinRange(lockIdxFrom, lockIdxTo, idxTo) || 
+                ArrayUtils.isWithinRange(lockIdxFrom, lockIdxTo, idxFrom)) {
+                return lock;
+            }
+        }
+
+        return null;
     }
 
     public void unlock(int indexFrom, int indexTo) {
