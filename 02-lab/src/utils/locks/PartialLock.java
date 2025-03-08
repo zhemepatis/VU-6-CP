@@ -1,4 +1,4 @@
-package utils;
+package utils.locks;
 
 // TODO: make locks sortable so that lock time would be shorter
 public class PartialLock {
