@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import utils.ArrayUtils;
 
-public class ArrayLock<T> {
+public class ArrayLock {
     private List<LockObject> locks;
 
     public ArrayLock() {
@@ -21,13 +21,13 @@ public class ArrayLock<T> {
                 if (conflictingLock == null) {
                     LockObject newLock = new LockObject(idxFrom, idxTo);
                     locks.add(newLock);
+                    break;
                 }
             }
 
-            if (conflictingLock != null)
+            synchronized (conflictingLock) {
                 conflictingLock.wait();
-            else 
-                break;
+            }
         }
     }
 
@@ -45,7 +45,26 @@ public class ArrayLock<T> {
         return null;
     }
 
-    public void unlock(int indexFrom, int indexTo) {
-        // TODO: implement
+    public void unlock(int idxFrom, int idxTo) {
+        LockObject currLock = null;
+        
+        synchronized (locks) {
+            for (LockObject lock : locks) {
+                int lockIdxFrom = lock.getIdxFrom();
+                int lockIdxTo = lock.getIdxTo();
+    
+                if (lockIdxFrom == idxFrom && lockIdxTo == idxTo) {
+                    locks.remove(lock);
+                    currLock = lock;
+                    break;
+                }
+            }
+        }
+
+        synchronized (currLock) {
+            if (currLock != null){
+                currLock.notify();
+            }
+        }
     }
 }
