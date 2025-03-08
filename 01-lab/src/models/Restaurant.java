@@ -1,7 +1,6 @@
 package models;
 
 import java.util.*;
-import utils.RestaurantPrinter;
 
 public class Restaurant {
     private String name;
@@ -74,9 +73,5 @@ public class Restaurant {
         }
 
         return false;
-    }
-
-    public void printAvailability() {
-        RestaurantPrinter.printAvailability(tables);
     }
 }
