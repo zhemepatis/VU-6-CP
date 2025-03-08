@@ -1,7 +1,8 @@
-package utils;
+package utils.locks;
 
 import java.util.List;
 import java.util.ArrayList;
+import utils.ArrayUtils;
 
 public class ArrayLock<T> {
     private List<PartialLock> locks;
