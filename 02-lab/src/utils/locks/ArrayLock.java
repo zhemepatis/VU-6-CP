@@ -11,6 +11,7 @@ public class ArrayLock {
         this.locks = new ArrayList<LockObject>();
     }
 
+    // TODO: handle Interrupted exception
     public void lock(int idxFrom, int idxTo) throws InterruptedException {
         while (true) {
             LockObject conflictingLock;
@@ -46,25 +47,29 @@ public class ArrayLock {
     }
 
     public void unlock(int idxFrom, int idxTo) {
-        LockObject currLock = null;
+        LockObject lockToRelease = null;
         
         synchronized (locks) {
-            for (LockObject lock : locks) {
-                int lockIdxFrom = lock.getIdxFrom();
-                int lockIdxTo = lock.getIdxTo();
-    
-                if (lockIdxFrom == idxFrom && lockIdxTo == idxTo) {
-                    locks.remove(lock);
-                    currLock = lock;
-                    break;
-                }
+            lockToRelease = getLockObject(idxFrom, idxTo);
+            
+            if (lockToRelease != null) {
+                locks.remove(lockToRelease);
             }
         }
 
-        synchronized (currLock) {
-            if (currLock != null){
-                currLock.notify();
-            }
+        synchronized (lockToRelease) {
+            lockToRelease.notify();
         }
+    }
+
+    private LockObject getLockObject(int idxFrom, int idxTo) {
+        LockObject lock = new LockObject(idxFrom, idxTo);
+
+        int lockIdx = locks.indexOf(lock);
+        if (lockIdx == -1) {
+            return null;
+        }
+
+        return locks.get(lockIdx);
     }
 }

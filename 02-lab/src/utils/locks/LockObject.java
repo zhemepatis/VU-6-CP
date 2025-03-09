@@ -17,4 +17,10 @@ class LockObject {
     protected int getIdxTo() {
         return idxTo;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        LockObject that = (LockObject) obj;
+        return this.idxFrom == that.idxFrom && this.idxTo == that.idxTo; 
+    }
 }
