@@ -1,50 +1,49 @@
-import utils.locks.ArrayLock;
+import utils.CounterLock;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        ArrayLock arrLock = new ArrayLock();
-
+       CounterLock lock = new CounterLock();
+       
         Thread thread1 = new Thread(() -> {
             System.out.println("Thread started - Thread1");
 
             try {
-                arrLock.lock(1, 5);
+                lock.await(20);
             }
             catch (InterruptedException ex) {}
 
             System.out.println("Thread finished - Thread1");
         });
 
-        Thread thread2 = new Thread(() -> {
-            System.out.println("Thread started - Thread2");
-
-            try {
-                Thread.sleep(5000);
-                arrLock.unlock(1, 5);
-            }
-            catch (InterruptedException ex) {}
-
-
-            System.out.println("Thread finished - Thread2");
-        });
-
         Thread thread3 = new Thread(() -> {
             System.out.println("Thread started - Thread3");
 
             try {
-                arrLock.lock(1, 5);
+                lock.await(50);
             }
             catch (InterruptedException ex) {}
 
             System.out.println("Thread finished - Thread3");
         });
 
-        thread1.start();
-        thread2.start();
-        thread3.start();
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Thread started - Thread2");
 
-        thread1.join();
-        thread2.join();
-        thread3.join();
+            for (int i = 0; i < 50; ++i) {
+                lock.advance();
+                System.out.println("i: " + i);
+            }
+
+            System.out.println("Thread finished - Thread2");
+        });
+
+
+       thread1.start();
+       thread2.start();
+       thread3.start();
+
+       thread1.join();
+       thread2.join();
+       thread3.join();
     }
 }
