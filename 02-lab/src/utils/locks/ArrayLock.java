@@ -22,12 +22,24 @@ public class ArrayLock {
                 if (conflictingLock == null) {
                     LockObject newLock = new LockObject(idxFrom, idxTo);
                     locks.add(newLock);
-                    break;
+                    return;
                 }
             }
 
-            synchronized (conflictingLock) {
-                conflictingLock.wait();
+            while (conflictingLock != null) {
+                LockObject concreteLock;
+
+                synchronized (conflictingLock) {
+                    synchronized (locks) {
+                        concreteLock = getLockObject(idxFrom, idxTo);
+                        if (concreteLock != conflictingLock)
+                            continue;
+                    }
+    
+                    conflictingLock.wait();
+                }
+
+                conflictingLock = concreteLock;
             }
         }
     }
@@ -51,14 +63,17 @@ public class ArrayLock {
         
         synchronized (locks) {
             lockToRelease = getLockObject(idxFrom, idxTo);
-            
-            if (lockToRelease != null) {
-                locks.remove(lockToRelease);
-            }
+
+            if (lockToRelease == null)
+                return;
         }
 
         synchronized (lockToRelease) {
-            lockToRelease.notify();
+            lockToRelease.notifyAll();
+        }
+
+        synchronized (locks) {
+            locks.remove(lockToRelease);
         }
     }
 

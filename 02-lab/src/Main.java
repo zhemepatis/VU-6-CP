@@ -5,44 +5,46 @@ public class Main {
         ArrayLock arrLock = new ArrayLock();
 
         Thread thread1 = new Thread(() -> {
-            System.out.println("Thread1 started.");
+            System.out.println("Thread started - Thread1");
 
             try {
-
-                System.out.println("Locking the range.");
                 arrLock.lock(1, 5);
-
-                System.out.println("Prepare to sleep.");
-                Thread.sleep(5000);
-
-                System.out.println("Unlocking the range.");
-                arrLock.unlock(1, 5);
             }
-            catch (InterruptedException ex) {
-                System.out.println("Interruption in thread1");
-            }
+            catch (InterruptedException ex) {}
 
-            System.out.println("Thread1 finished.");
+            System.out.println("Thread finished - Thread1");
         });
 
         Thread thread2 = new Thread(() -> {
-            System.out.println("Thread2 started.");
+            System.out.println("Thread started - Thread2");
 
             try {
-                System.out.println("Locking the range.");
+                Thread.sleep(5000);
+                arrLock.unlock(1, 5);
+            }
+            catch (InterruptedException ex) {}
+
+
+            System.out.println("Thread finished - Thread2");
+        });
+
+        Thread thread3 = new Thread(() -> {
+            System.out.println("Thread started - Thread3");
+
+            try {
                 arrLock.lock(1, 5);
             }
-            catch (InterruptedException ex) {
-                System.out.println("Interruption in thread2");
-            }
+            catch (InterruptedException ex) {}
 
-            System.out.println("Thread2 finished.");
+            System.out.println("Thread finished - Thread3");
         });
 
         thread1.start();
         thread2.start();
+        thread3.start();
 
         thread1.join();
         thread2.join();
+        thread3.join();
     }
 }
