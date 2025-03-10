@@ -1,49 +1,23 @@
-import utils.CounterLock;
+import models.GameServer;
+import utils.PlayerTask;
 
 public class Main {
+    public static final int REQUIRED_PLAYERS = 50;
+
     public static void main(String[] args) throws Exception {
-       CounterLock lock = new CounterLock();
-       
-        Thread thread1 = new Thread(() -> {
-            System.out.println("Thread started - Thread1");
+        GameServer server = new GameServer(REQUIRED_PLAYERS);
+        Thread[] threads = new Thread[REQUIRED_PLAYERS];
 
-            try {
-                lock.await(20);
-            }
-            catch (InterruptedException ex) {}
+        // creating and running tasks, threads
+        for (int i = 0; i < REQUIRED_PLAYERS; ++i) {
+            PlayerTask task = new PlayerTask(server, ("Thread" + (i+1)));
+            threads[i] = new Thread(task);
+            threads[i].start();
+        }
 
-            System.out.println("Thread finished - Thread1");
-        });
-
-        Thread thread3 = new Thread(() -> {
-            System.out.println("Thread started - Thread3");
-
-            try {
-                lock.await(50);
-            }
-            catch (InterruptedException ex) {}
-
-            System.out.println("Thread finished - Thread3");
-        });
-
-        Thread thread2 = new Thread(() -> {
-            System.out.println("Thread started - Thread2");
-
-            for (int i = 0; i < 50; ++i) {
-                lock.advance();
-                System.out.println("i: " + i);
-            }
-
-            System.out.println("Thread finished - Thread2");
-        });
-
-
-       thread1.start();
-       thread2.start();
-       thread3.start();
-
-       thread1.join();
-       thread2.join();
-       thread3.join();
+        // waiting for all threads to finish their tasks
+        for (Thread thread : threads) {
+            thread.join();
+        }
     }
 }
