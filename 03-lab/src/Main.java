@@ -1,15 +1,15 @@
-import java.io.File;
 import java.util.*;
-import models.Map;
+import java.io.*;
+import models.*;
 
 public class Main {
     private static final String INPUT_FILE_PATH = "data/input.txt";
 
     public static void main(String[] args) throws Exception {
         int threadCount = parseArgs(args);
-        Map map = createMap(INPUT_FILE_PATH);
-
-        map.printTiles();
+        Board board = createBoard(INPUT_FILE_PATH);
+        
+        board.printBoard();
     }
 
     private static int parseArgs(String[] args) throws Exception {
@@ -17,26 +17,29 @@ public class Main {
         return threadCount;
     }
 
-    private static Map createMap(String filePath) throws Exception {
+    private static Board createBoard(String filePath) throws Exception {
         File file = new File(filePath);
         Scanner reader = new Scanner(file);
 
         // reading map dimensions
-        int x = reader.nextInt();
-        int y = reader.nextInt();
+        int dimX = reader.nextInt();
+        int dimY = reader.nextInt();
 
         // reading marked tiles
-        List<Integer> markedTiles = new ArrayList<>();
+        List<Coordinates> markedTiles = new ArrayList<>();
 
         while (reader.hasNext()) {
-            int tileNum = reader.nextInt();
-            markedTiles.add(tileNum);
+            int x = reader.nextInt();
+            int y = reader.nextInt();
+
+            Coordinates coords = new Coordinates(x, y);
+            markedTiles.add(coords);
         }
 
         // closing resources
         reader.close();
 
         // creating map based on input
-        return new Map(x, y, markedTiles);
+        return new Board(dimX, dimY, markedTiles);
     }
 }
