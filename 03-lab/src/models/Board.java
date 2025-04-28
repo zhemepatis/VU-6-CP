@@ -33,7 +33,7 @@ public class Board extends Grid {
         for (int[] dir : directions) {
             int newX = x + dir[0];
             int newY = y + dir[1];
-    
+
             if (isInBounds(newX, newY) && getCellState(newX, newY)) {
                 ++count;
             }

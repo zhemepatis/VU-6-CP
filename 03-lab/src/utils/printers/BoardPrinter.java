@@ -16,9 +16,11 @@ public class BoardPrinter {
 
         for (int i = 0; i < y; ++i) {
             for (int j = 0; j < x; ++j) {
-                boolean isActive = board.getCellState(x, y);
-                result += (isActive) ? "+" : " ";
+                boolean isActive = board.getCellState(i, j);
+                result += (isActive) ? "+" : ".";
             }
+
+            result += "\n";
         }
 
         System.out.println(result);
