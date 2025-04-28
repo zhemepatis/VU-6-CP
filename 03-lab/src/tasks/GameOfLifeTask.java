@@ -2,20 +2,22 @@ package tasks;
 
 import models.Board;
 import utils.concurrency.CounterLock;
+import utils.printers.BoardPrinter;
 
 public class GameOfLifeTask implements Runnable {
     private final int THREAD_COUNT;
     private Thread[] threads;
 
-    private CounterLock barrierLock;
-    private boolean proceed;
+    private CounterLock taskCompletionLock;
+    private CounterLock procceedCalculationsLock;
 
     private Board board;
     private Boolean gameFinished;
 
     public GameOfLifeTask(int threadCount, Board board) {
         this.THREAD_COUNT = threadCount;
-        this.barrierLock = new CounterLock();
+        this.taskCompletionLock = new CounterLock();
+        this.procceedCalculationsLock = new CounterLock();
 
         this.board = board;
         this.gameFinished = Boolean.FALSE;
@@ -25,14 +27,18 @@ public class GameOfLifeTask implements Runnable {
     
     @Override
     public void run() {
+        BoardPrinter boardPrinter = new BoardPrinter(board);
+
         while (!gameFinished) {
+            boardPrinter.print();
+
             runThreads();
 
             // wait for all threads to complete their tasks
             try {
-                barrierLock.await(THREAD_COUNT);
+                taskCompletionLock.await(THREAD_COUNT);
             } catch (InterruptedException ex) {
-                System.out.println("Await has been interrupted.");
+                System.out.println("Interrupted task completion lock await.");
                 break;
             }
 
@@ -44,7 +50,8 @@ public class GameOfLifeTask implements Runnable {
 
             board.applyNextBoard();
 
-            // TODO: let other threads know that it is allowed to proceed
+            // let calculation tasks proceed
+            procceedCalculationsLock.advance();
         }
     }
 
@@ -54,15 +61,19 @@ public class GameOfLifeTask implements Runnable {
         threads = new Thread[THREAD_COUNT];
         int threadShare = cellNum / THREAD_COUNT;
         int remainder = cellNum % THREAD_COUNT;
+        System.out.println(remainder);
 
         int startIndex = 0;
         for (int i = 0; i < THREAD_COUNT; ++i) {
-            int endIndex = startIndex + threadShare;
+            int endIndex = startIndex + threadShare - 1;
             if (i < remainder) {
                 ++endIndex;
             }
 
-            CalculationTask task = new CalculationTask(startIndex, endIndex, board, gameFinished, barrierLock);
+            System.out.println(startIndex);
+            System.out.println(endIndex);
+            System.out.println();
+            CalculationTask task = new CalculationTask(startIndex, endIndex, board, gameFinished, procceedCalculationsLock, taskCompletionLock);
             threads[i] = new Thread(task);
 
             startIndex = endIndex + 1;
