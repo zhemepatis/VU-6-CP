@@ -1,44 +1,28 @@
 package tasks;
 
-import java.util.*;
 import models.*;
 
 public class CalculationTask implements Runnable {
-    private Board board;
-    private Queue<Integer> pool;
+    private final int START_INDEX;
+    private final int END_INDEX;
 
-    public CalculationTask(Board board, Queue<Integer> pool) {
+    private Board board;
+    private Boolean gameFinished;
+
+    public CalculationTask(int startIndex, int endIndex, Board board, Boolean gameFinished) {
+        this.START_INDEX = startIndex;
+        this.END_INDEX = endIndex;
+
         this.board = board;
-        this.pool = pool;
+        this.gameFinished = gameFinished;
     }
 
     @Override
     public void run() {
-        while (true) {
-            Integer index;
-            synchronized (pool) {
-                index = pool.poll();
-            }
-
-            if (index == null) {
-                break;
-            }
-
-            // get cells of interest
-            Cell currCell = board.getCell(index);
-            List<Cell> adjCells = board.getAdjCells(index);
-
-            // calculating next state
-            int markedCellsCount = 0;
-            for (Cell cell : adjCells) {
-                boolean isMarked = cell.getState();
-                
-                if (isMarked) {
-                    ++markedCellsCount;
-                }
-            }
-            
-            currCell.calculateNextState(markedCellsCount);
+        while (!gameFinished) {
+            // TODO: Calculate
+            // TODO: Increment barrier
+            // TODO: Wait for indication
         }
     }
 }

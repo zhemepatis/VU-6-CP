@@ -1,6 +1,7 @@
 import java.util.*;
 import java.io.*;
 import models.*;
+import tasks.GameOfLifeTask;
 
 public class Main {
     private static final String INPUT_FILE_PATH = "data/input.txt";
@@ -9,7 +10,15 @@ public class Main {
         int threadCount = parseArgs(args);
         Board board = createBoard(INPUT_FILE_PATH);
         
-        board.printBoard();
+        // create main task and thread
+        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(threadCount, board);
+        Thread gameOfLifeThread = new Thread(gameOfLifeTask);
+
+        // run thread
+        gameOfLifeThread.run();
+
+        // wait for thread to finish
+        gameOfLifeThread.join();
     }
 
     private static int parseArgs(String[] args) throws Exception {
