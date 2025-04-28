@@ -9,6 +9,18 @@ public class Grid {
         this.Y_DIM = y;
     }
 
+    public int getXDimension() {
+        return X_DIM;
+    }
+
+    public int getYDimension() {
+        return Y_DIM;
+    }
+
+    public int getSize() {
+        return X_DIM*Y_DIM;
+    }
+
     protected boolean isInBounds(int x, int y) {
         return x >= 0 && x < X_DIM && y >= 0 && y < Y_DIM;
     }

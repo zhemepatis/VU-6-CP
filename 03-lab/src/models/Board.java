@@ -50,17 +50,26 @@ public class Board extends Grid {
         return countActiveNeighbors(x, y);
     }
 
-    public void setNextState(int index, boolean state) {
+    public void setNextCellState(int index, boolean state) {
         Coordinates coords = convertIndexToCoords(index);
         int x = coords.getX();
         int y = coords.getY();
 
-        setNextState(x, y, state);
+        setNextCellState(x, y, state);
     }
 
-    public void setNextState(int x, int y, boolean state) {
-        nextBoard[x][y] = state;
+    public void setNextCellState(int x, int y, boolean newState) {
+        boolean currState = getCellState(x, y);
+        nextBoard[x][y] = newState;
+
+        if (newState != currState) {
+            hasChanged = true;
+        }
     }
+
+    public boolean hasBoardChanged() {
+        return hasChanged;
+    } 
 
     public boolean calculateNextState(boolean state, int activeNeighborCount) {
         boolean nextState;
@@ -75,8 +84,9 @@ public class Board extends Grid {
         return nextState;
     }
 
-    public void proceed() {
+    public void applyNextBoard() {
         currBoard = nextBoard;
         nextBoard = new boolean[X_DIM][Y_DIM];
+        hasChanged = false;
     }
 }

@@ -2,6 +2,7 @@ package tasks;
 
 import models.*;
 import utils.*;
+import utils.concurrency.CounterLock;
 
 public class CalculationTask implements Runnable {
     private final int START_INDEX;
@@ -30,7 +31,7 @@ public class CalculationTask implements Runnable {
                 boolean currState = board.getCellState(i);
                 boolean newState = board.calculateNextState(currState, activeNeighborCount);
 
-                board.setNextState(i, newState);
+                board.setNextCellState(i, newState);
             }
 
             barrierLock.advance();

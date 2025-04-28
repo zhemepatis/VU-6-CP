@@ -1,4 +1,4 @@
-package utils;
+package utils.concurrency;
 
 public class CounterLock {
     private int counterValue;
