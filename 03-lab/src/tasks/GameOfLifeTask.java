@@ -24,7 +24,10 @@ public class GameOfLifeTask implements Runnable {
     @Override
     public void run() {
         while (!gameFinished) {
-
+            // run threads
+            // wait for all of threads to complete their jobs
+            // check if work is done
+            // proceed accoridingly
         }
     }
 
