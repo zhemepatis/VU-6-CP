@@ -21,9 +21,4 @@ public class CounterLock {
             this.wait();
         }
     }
-
-    public synchronized void reset() {
-        counterValue = 0;
-        this.notify();
-    }
 }

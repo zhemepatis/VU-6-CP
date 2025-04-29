@@ -4,12 +4,16 @@ import models.*;
 import tasks.GameOfLifeTask;
 
 public class Main {
+    private static int dimX;
+    private static int dimY;
+    private static int threadCount;
+
     private static final String INPUT_FILE_PATH = "data/input.txt";
 
     public static void main(String[] args) throws Exception {
-        int threadCount = parseArgs(args);
-        int maxIterationCount = 1000;
-        Board board = createBoard(INPUT_FILE_PATH);
+        parseArgs(args);
+        int maxIterationCount = 100000;
+        Board board = createBoard();
         
         // create main task and thread
         GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(maxIterationCount, board, threadCount);
@@ -22,18 +26,15 @@ public class Main {
         gameOfLifeThread.join();
     }
 
-    private static int parseArgs(String[] args) throws Exception {
-        int threadCount = Integer.parseInt(args[0]);
-        return threadCount;
+    private static void parseArgs(String[] args) throws Exception {
+        dimX = Integer.parseInt(args[0]);
+        dimY = Integer.parseInt(args[1]);
+        threadCount = Integer.parseInt(args[2]);
     }
 
-    private static Board createBoard(String filePath) throws Exception {
-        File file = new File(filePath);
+    private static Board createBoard() throws Exception {
+        File file = new File(INPUT_FILE_PATH);
         Scanner reader = new Scanner(file);
-
-        // reading map dimensions
-        int dimX = reader.nextInt();
-        int dimY = reader.nextInt();
 
         // reading marked tiles
         List<Coordinates> markedTiles = new ArrayList<>();

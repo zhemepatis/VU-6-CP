@@ -99,8 +99,6 @@ public class GameOfLifeTask implements Runnable {
         int threadShare = cellNum / THREAD_COUNT;
         int remainder = cellNum % THREAD_COUNT;
 
-        int sum = 0;
-
         int startIndex = 0;
         for (int i = 0; i < THREAD_COUNT; ++i) {
             int endIndex = startIndex + threadShare - 1;
