@@ -8,6 +8,7 @@ import utils.wrappers.BooleanWrapper;
 public class GameOfLifeTask implements Runnable {
     private final int THREAD_COUNT;
     private Thread[] threads;
+    private boolean verbose;
 
     private CounterLock workersDoneLock;
     private CounterLock procceedCalculationsLock;
@@ -16,8 +17,9 @@ public class GameOfLifeTask implements Runnable {
     private int maxIterationCount;
     private BooleanWrapper gameFinished;
 
-    public GameOfLifeTask(int maxIterationCount, Board board, int threadCount) {
+    public GameOfLifeTask(int maxIterationCount, Board board, int threadCount, boolean verbose) {
         this.THREAD_COUNT = threadCount;
+        this.verbose = verbose;
         
         this.workersDoneLock = new CounterLock();
         this.procceedCalculationsLock = new CounterLock();
@@ -35,8 +37,10 @@ public class GameOfLifeTask implements Runnable {
         BoardPrinter boardPrinter = new BoardPrinter(board);
 
         // print initial setup
-        boardPrinter.printIteration(iteration);
-        boardPrinter.print();
+        if (verbose) {
+            boardPrinter.printIteration(iteration);
+            boardPrinter.print();
+        }
         ++iteration;
 
         // create and run threads
@@ -61,8 +65,10 @@ public class GameOfLifeTask implements Runnable {
             board.applyNextBoard();
 
             // print iteration
-            boardPrinter.printIteration(iteration);
-            boardPrinter.print();
+            if (verbose) {
+                boardPrinter.printIteration(iteration);
+                boardPrinter.print();
+            }
             ++iteration;
 
             if (iteration == maxIterationCount) {
@@ -80,8 +86,6 @@ public class GameOfLifeTask implements Runnable {
         } catch(Exception ex) {
 
         }
-
-        System.out.println("Game's finished");
     }
 
     private void awaitWorkerCompletion(int workerCount) {

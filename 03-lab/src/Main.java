@@ -7,29 +7,37 @@ public class Main {
     private static int dimX;
     private static int dimY;
     private static int threadCount;
+    private static boolean verbose;
 
     private static final String INPUT_FILE_PATH = "data/input.txt";
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
-        int maxIterationCount = 100000;
+        int maxIterationCount = 10000;
         Board board = createBoard();
         
         // create main task and thread
-        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(maxIterationCount, board, threadCount);
+        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(maxIterationCount, board, threadCount, verbose);
         Thread gameOfLifeThread = new Thread(gameOfLifeTask);
+
+        long startTime = System.currentTimeMillis();
 
         // run thread
         gameOfLifeThread.run();
 
-        // wait for thread to finish
-        gameOfLifeThread.join();
+        long endTime = System.currentTimeMillis();
+        double elapsedTime = (double) (endTime - startTime) / 1000;
+
+        System.out.println("Threads: " + threadCount);
+        System.out.println("Workload: " + dimX * dimY);
+        System.out.printf("Elapsed time: %.6f\n", elapsedTime);
     }
 
     private static void parseArgs(String[] args) throws Exception {
         dimX = Integer.parseInt(args[0]);
         dimY = Integer.parseInt(args[1]);
         threadCount = Integer.parseInt(args[2]);
+        verbose = Integer.parseInt(args[3]) == 1;
     }
 
     private static Board createBoard() throws Exception {
