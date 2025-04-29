@@ -13,15 +13,17 @@ public class GameOfLifeTask implements Runnable {
     private CounterLock procceedCalculationsLock;
 
     private Board board;
+    private int maxIterationCount;
     private BooleanWrapper gameFinished;
 
-    public GameOfLifeTask(int threadCount, Board board) {
+    public GameOfLifeTask(int maxIterationCount, Board board, int threadCount) {
         this.THREAD_COUNT = threadCount;
         
         this.workersDoneLock = new CounterLock();
         this.procceedCalculationsLock = new CounterLock();
 
         this.board = board;
+        this.maxIterationCount = maxIterationCount;
         this.gameFinished = new BooleanWrapper(false);
     }
     
@@ -37,13 +39,10 @@ public class GameOfLifeTask implements Runnable {
 
         // create and run threads
         runThreads();
-        System.out.println("GoL advance");
         procceedCalculationsLock.advance();
 
         // game loop
         while (!gameFinished.value) {
-            System.out.println("GoL task cycle");
-
             // wait for all threads to complete their tasks
             awaitWorkerCompletion(iteration*THREAD_COUNT);
 
@@ -52,7 +51,6 @@ public class GameOfLifeTask implements Runnable {
             if (!hasChanged) {
                 gameFinished.value = true;
 
-                System.out.println("GoL advance (for finish)");
                 procceedCalculationsLock.advance();
 
                 continue;
@@ -63,8 +61,11 @@ public class GameOfLifeTask implements Runnable {
             boardPrinter.printIteration(iteration);
             boardPrinter.print();
             ++iteration;
+
+            if (iteration == maxIterationCount) {
+                gameFinished.value = true;
+            }
             
-            System.out.println("GoL advance");
             procceedCalculationsLock.advance();
         }
 
@@ -82,9 +83,7 @@ public class GameOfLifeTask implements Runnable {
 
     private void awaitWorkerCompletion(int workerCount) {
         try {
-            System.out.println("GoL lock await: " + workerCount);
             workersDoneLock.await(workerCount);
-            System.out.println("GoL lock released");
         } catch (InterruptedException ex) {
             System.out.println("Interrupted task completion lock await.");
         }

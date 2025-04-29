@@ -32,9 +32,7 @@ public class CalculationTask implements Runnable {
         awaitStartSignal(nextIteration);
 
         // game loop
-        while (!gameFinished.value) {
-            System.out.println("Calculation task cycle");
-        
+        while (!gameFinished.value) {      
             for (int i = START_INDEX; i < END_INDEX; ++i) {
                 int activeNeighborCount = board.countActiveNeighbors(i);
                 boolean currState = board.getCellState(i);
@@ -43,7 +41,6 @@ public class CalculationTask implements Runnable {
                 board.setNextCellState(i, newState);
             }
 
-            System.out.println("Calculation advance");
             workersDoneLock.advance();
 
             ++nextIteration;
@@ -53,11 +50,7 @@ public class CalculationTask implements Runnable {
 
     public void awaitStartSignal(int await) {
         try {
-            System.out.println("Calculation lock await: " + await);
-
             procceedCalculationsLock.await(await);
-            
-            System.out.println("Claculation lock released");
         } catch(InterruptedException ex) {
             System.out.println("Interrupted proceed calculations lock await.");
         }   

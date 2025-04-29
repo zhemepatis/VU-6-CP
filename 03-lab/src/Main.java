@@ -8,10 +8,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         int threadCount = parseArgs(args);
+        int maxIterationCount = 1000;
         Board board = createBoard(INPUT_FILE_PATH);
         
         // create main task and thread
-        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(threadCount, board);
+        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(maxIterationCount, board, threadCount);
         Thread gameOfLifeThread = new Thread(gameOfLifeTask);
 
         // run thread
