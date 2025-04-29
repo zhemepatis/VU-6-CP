@@ -31,39 +31,44 @@ public class GameOfLifeTask implements Runnable {
         BoardPrinter boardPrinter = new BoardPrinter(board);
 
         // print initial setup
-        System.out.println("Iteration: " + iteration);
+        boardPrinter.printIteration(iteration);
         boardPrinter.print();
         ++iteration;
 
+        // create and run threads
         runThreads();
         System.out.println("GoL advance");
         procceedCalculationsLock.advance();
 
+        // game loop
         while (!gameFinished.value) {
             System.out.println("GoL task cycle");
 
             // wait for all threads to complete their tasks
-            waitForCalculationsToFinish(iteration*THREAD_COUNT);
+            awaitWorkerCompletion(iteration*THREAD_COUNT);
 
             // check if it's time to end the game
             boolean hasChanged = board.hasBoardChanged();
-            if (hasChanged) {
-                board.applyNextBoard();
+            if (!hasChanged) {
+                gameFinished.value = true;
 
-                System.out.println("Iteration: " + iteration);
-                boardPrinter.print();
-                ++iteration;
-                
-                System.out.println("GoL advance");
+                System.out.println("GoL advance (for finish)");
                 procceedCalculationsLock.advance();
+
                 continue;
             }
 
-            gameFinished.value = true;
-            System.out.println("GoL advance (for finish)");
+            board.applyNextBoard();
+
+            boardPrinter.printIteration(iteration);
+            boardPrinter.print();
+            ++iteration;
+            
+            System.out.println("GoL advance");
             procceedCalculationsLock.advance();
         }
 
+        // waiting for all threads to finish their tasks
         try {
             for (Thread thread : threads) {
                 thread.join();
@@ -75,10 +80,10 @@ public class GameOfLifeTask implements Runnable {
         System.out.println("Game's finished");
     }
 
-    private void waitForCalculationsToFinish(int await) {
+    private void awaitWorkerCompletion(int workerCount) {
         try {
-            System.out.println("GoL lock await: " + await);
-            workersDoneLock.await(await);
+            System.out.println("GoL lock await: " + workerCount);
+            workersDoneLock.await(workerCount);
             System.out.println("GoL lock released");
         } catch (InterruptedException ex) {
             System.out.println("Interrupted task completion lock await.");

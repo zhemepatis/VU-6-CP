@@ -29,7 +29,7 @@ public class CalculationTask implements Runnable {
     public void run() {
         int nextIteration = 1;
 
-        waitForCalculationStart(nextIteration);
+        awaitStartSignal(nextIteration);
 
         // game loop
         while (!gameFinished.value) {
@@ -47,12 +47,11 @@ public class CalculationTask implements Runnable {
             workersDoneLock.advance();
 
             ++nextIteration;
-            waitForCalculationStart(nextIteration);
-            System.out.println(gameFinished);
+            awaitStartSignal(nextIteration);
         }
     }
 
-    public void waitForCalculationStart(int await) {
+    public void awaitStartSignal(int await) {
         try {
             System.out.println("Calculation lock await: " + await);
 

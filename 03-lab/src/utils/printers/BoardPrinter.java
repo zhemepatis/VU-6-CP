@@ -9,6 +9,10 @@ public class BoardPrinter {
         this.board = board;
     }
 
+    public void printIteration(int iteration) {
+        System.out.println("ITERATION: " + iteration);
+    }
+
     public void print() {
         String result = "";
         int x = board.getXDimension();

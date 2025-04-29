@@ -7,11 +7,22 @@ public class Board extends Grid {
     private boolean[][] nextBoard;
     private boolean hasChanged;
 
-    public Board(int x, int y, List<Coordinates> markedCells) {
+    public Board(int x, int y, List<Coordinates> activeCells) {
         super(x, y);
 
         this.currBoard = new boolean[x][y];
         this.nextBoard = new boolean[x][y];
+
+        initBoard(activeCells);
+    }
+
+    private void initBoard(List<Coordinates> activeCells) {
+        for (Coordinates coords : activeCells) {
+            int x = coords.getX();
+            int y = coords.getY();
+
+            currBoard[y][x] = true;
+        }
     }
 
     public boolean getCellState(int index) {
