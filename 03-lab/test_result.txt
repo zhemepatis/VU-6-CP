@@ -1,14 +1,101 @@
-java TTest
-Simple system multithreading performance test. Ver 1.3
-Parameters: <number threads 1..16> <workload: 1..100000000>
-#Make auto test: find workload for > 1 sec...
-#nThreads #workload #timeS #speedup
+Threads: 1
+Workload: 3600
+Elapsed time: 1.501000
 
-1 2048 1.704 1.0
-2 2048 0.918 1.8562091503267972
-4 2048 0.89 1.9146067415730337
-8 2048 1.306 1.3047473200612556
-16 2048 1.411 1.2076541459957477
-32 2048 1.58 1.0784810126582278
+Threads: 2
+Workload: 3600
+Elapsed time: 1.071000
 
-#completed
+Threads: 4
+Workload: 3600
+Elapsed time: 0.832000
+
+Threads: 8
+Workload: 3600
+Elapsed time: 0.919000
+
+Threads: 16
+Workload: 3600
+Elapsed time: 1.276000
+
+Threads: 32
+Workload: 3600
+Elapsed time: 2.240000
+
+--------------------------80 80
+
+Threads: 1
+Workload: 6400
+Elapsed time: 2.394000
+
+Threads: 2
+Workload: 6400
+Elapsed time: 1.550000
+
+Threads: 4
+Workload: 6400
+Elapsed time: 1.265000
+
+Threads: 8
+Workload: 6400
+Elapsed time: 1.295000
+
+Threads: 16
+Workload: 6400
+Elapsed time: 1.489000
+
+Threads: 32
+Workload: 6400
+Elapsed time: 2.252000
+
+---------------------------100 100
+
+Threads: 1
+Workload: 10000
+Elapsed time: 3.461000
+
+Threads: 2
+Workload: 10000
+Elapsed time: 2.213000
+
+Threads: 4
+Workload: 10000
+Elapsed time: 1.868000
+
+Threads: 8
+Workload: 10000
+Elapsed time: 1.913000
+
+Threads: 16
+Workload: 10000
+Elapsed time: 1.914000
+
+Threads: 32
+Workload: 10000
+Elapsed time: 2.440000
+
+-----------------------120 120
+
+Threads: 1
+Workload: 14400
+Elapsed time: 5.070000
+
+Threads: 2
+Workload: 14400
+Elapsed time: 3.038000
+
+Threads: 4
+Workload: 14400
+Elapsed time: 2.537000
+
+Threads: 8
+Workload: 14400
+Elapsed time: 2.687000
+
+Threads: 16
+Workload: 14400
+Elapsed time: 2.711000
+
+Threads: 32
+Workload: 14400
+Elapsed time: 2.849000
