@@ -71,7 +71,7 @@ public class Board extends Grid {
 
     public void setNextCellState(int x, int y, boolean newState) {
         boolean currState = getCellState(x, y);
-        nextBoard[x][y] = newState;
+        nextBoard[y][x] = newState;
 
         if (newState != currState) {
             hasChanged = true;

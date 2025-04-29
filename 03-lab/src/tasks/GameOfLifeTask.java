@@ -25,6 +25,8 @@ public class GameOfLifeTask implements Runnable {
         this.board = board;
         this.maxIterationCount = maxIterationCount;
         this.gameFinished = new BooleanWrapper(false);
+
+        createThreads();
     }
     
     @Override
@@ -38,7 +40,7 @@ public class GameOfLifeTask implements Runnable {
         ++iteration;
 
         // create and run threads
-        runThreads();
+        startThreads();
         procceedCalculationsLock.advance();
 
         // game loop
@@ -58,6 +60,7 @@ public class GameOfLifeTask implements Runnable {
 
             board.applyNextBoard();
 
+            // print iteration
             boardPrinter.printIteration(iteration);
             boardPrinter.print();
             ++iteration;
@@ -89,25 +92,33 @@ public class GameOfLifeTask implements Runnable {
         }
     }
 
-    private void runThreads() {
+    private void createThreads() {
         int cellNum = board.getSize();
 
         threads = new Thread[THREAD_COUNT];
         int threadShare = cellNum / THREAD_COUNT;
         int remainder = cellNum % THREAD_COUNT;
 
+        int sum = 0;
+
         int startIndex = 0;
         for (int i = 0; i < THREAD_COUNT; ++i) {
             int endIndex = startIndex + threadShare - 1;
+
             if (i < remainder) {
                 ++endIndex;
             }
 
             CalculationTask task = new CalculationTask(startIndex, endIndex, board, gameFinished, procceedCalculationsLock, workersDoneLock);
             threads[i] = new Thread(task);
-            threads[i].start();
 
             startIndex = endIndex + 1;
+        }
+    }
+
+    private void startThreads() {
+        for (Thread thread : threads) {
+            thread.start();
         }
     }
 }
