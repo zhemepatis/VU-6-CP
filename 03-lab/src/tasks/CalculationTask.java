@@ -33,7 +33,7 @@ public class CalculationTask implements Runnable {
 
         // game loop
         while (!gameFinished.value) {      
-            for (int i = START_INDEX; i <= END_INDEX; ++i) {
+            for (int i = START_INDEX; i < END_INDEX - 1; ++i) {
                 int activeNeighborCount = board.countActiveNeighbors(i);
                 boolean currState = board.getCellState(i);
                 boolean newState = board.calculateNextState(currState, activeNeighborCount);

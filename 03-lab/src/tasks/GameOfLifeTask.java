@@ -52,16 +52,6 @@ public class GameOfLifeTask implements Runnable {
             // wait for all threads to complete their tasks
             awaitWorkerCompletion(iteration*THREAD_COUNT);
 
-            // check if it's time to end the game
-            boolean hasChanged = board.hasBoardChanged();
-            if (!hasChanged) {
-                gameFinished.value = true;
-
-                procceedCalculationsLock.advance();
-
-                continue;
-            }
-
             board.applyNextBoard();
 
             // print iteration

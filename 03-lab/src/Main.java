@@ -13,7 +13,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
-        int maxIterationCount = 10000;
+        verbose = false;
+        int maxIterationCount = 1000;
         Board board = createBoard();
         
         // create main task and thread
@@ -36,7 +37,9 @@ public class Main {
     private static void parseArgs(String[] args) throws Exception {
         dimX = Integer.parseInt(args[0]);
         dimY = Integer.parseInt(args[1]);
+
         threadCount = Integer.parseInt(args[2]);
+
         verbose = Integer.parseInt(args[3]) == 1;
     }
 
