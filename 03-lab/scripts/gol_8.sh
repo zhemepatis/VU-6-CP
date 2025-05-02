@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -p main
-#SBATCH -n8
+#SBATCH -n10
 
 THREAD_NUM=8
 
