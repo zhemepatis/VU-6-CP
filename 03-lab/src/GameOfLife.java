@@ -1,15 +1,14 @@
 import java.util.*;
-import java.io.*;
 import models.*;
 import tasks.*;
 
 public class GameOfLife {
     private static int dimX;
     private static int dimY;
-    private static int threadCount;
-    private static boolean verbose;
 
-    private static final String INPUT_FILE_PATH = "data/input.txt";
+    private static int threadCount;
+
+    private static boolean verbose;
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
@@ -42,22 +41,21 @@ public class GameOfLife {
     }
 
     private static Board createBoard() throws Exception {
-        File file = new File(INPUT_FILE_PATH);
-        Scanner reader = new Scanner(file);
+        long seed = System.nanoTime();
+        Random rnd = new Random(seed);
 
-        // reading marked tiles
         List<Coordinates> markedTiles = new ArrayList<>();
 
-        while (reader.hasNext()) {
-            int x = reader.nextInt();
-            int y = reader.nextInt();
+        for (int i = 0; i < dimY; ++i) {
+            for (int j = 0; j < dimX; ++j) {
+                boolean cellState = rnd.nextBoolean();
 
-            Coordinates coords = new Coordinates(x, y);
-            markedTiles.add(coords);
+                if (cellState) {
+                    Coordinates coords = new Coordinates(j, i);
+                    markedTiles.add(coords);
+                }
+            }
         }
-
-        // closing resources
-        reader.close();
 
         // creating map based on input
         return new Board(dimX, dimY, markedTiles);
