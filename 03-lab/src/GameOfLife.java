@@ -1,9 +1,9 @@
 import java.util.*;
 import java.io.*;
 import models.*;
-import tasks.GameOfLifeTask;
+import tasks.*;
 
-public class Main {
+public class GameOfLife {
     private static int dimX;
     private static int dimY;
     private static int threadCount;
@@ -13,12 +13,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
-        verbose = false;
-        int maxIterationCount = 1000;
+        int maxIterationCount = 100;
         Board board = createBoard();
         
         // create main task and thread
-        GameOfLifeTask gameOfLifeTask = new GameOfLifeTask(maxIterationCount, board, threadCount, verbose);
+        ManagementTask gameOfLifeTask = new ManagementTask(maxIterationCount, board, threadCount, verbose);
         Thread gameOfLifeThread = new Thread(gameOfLifeTask);
 
         long startTime = System.currentTimeMillis();

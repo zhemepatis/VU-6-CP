@@ -1,38 +1,37 @@
 package tasks;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 import models.*;
-import utils.concurrency.CounterLock;
-import utils.wrappers.*;;
 
 public class CalculationTask implements Runnable {
     private final int START_INDEX;
     private final int END_INDEX;
 
     private Board board;
-    private BooleanWrapper gameFinished;
+    private int maxIterationCount;
 
-    private CounterLock procceedCalculationsLock;
-    private CounterLock workersDoneLock;
+    private CyclicBarrier barrier;
 
-    public CalculationTask(int startIndex, int endIndex, Board board, BooleanWrapper gameFinished, CounterLock procceedCalculationsLock, CounterLock workersDoneLock) {
+    public CalculationTask(int startIndex, int endIndex, Board board, int maxIterationCount, CyclicBarrier barrier) {
         this.START_INDEX = startIndex;
         this.END_INDEX = endIndex;
 
         this.board = board;
-        this.gameFinished = gameFinished;
+        this.maxIterationCount = maxIterationCount;
 
-        this.procceedCalculationsLock = procceedCalculationsLock;
-        this.workersDoneLock = workersDoneLock;
+        this.barrier = barrier;
     }
 
     @Override
     public void run() {
-        int nextIteration = 1;
+        int iteration = 1;
 
-        awaitStartSignal(nextIteration);
+        awaitThreads();
 
         // game loop
-        while (!gameFinished.value) {      
+        while (iteration != maxIterationCount) {      
             for (int i = START_INDEX; i < END_INDEX - 1; ++i) {
                 int activeNeighborCount = board.countActiveNeighbors(i);
                 boolean currState = board.getCellState(i);
@@ -41,18 +40,18 @@ public class CalculationTask implements Runnable {
                 board.setNextCellState(i, newState);
             }
 
-            workersDoneLock.advance();
+            awaitThreads();
+            awaitThreads();
 
-            ++nextIteration;
-            awaitStartSignal(nextIteration);
+            ++iteration;
         }
     }
 
-    private void awaitStartSignal(int await) {
+    private void awaitThreads() {
         try {
-            procceedCalculationsLock.await(await);
-        } catch(InterruptedException ex) {
-            System.out.println("Interrupted proceed calculations lock await.");
-        }   
+            barrier.await();
+        } catch (InterruptedException | BrokenBarrierException ex) {
+            System.out.println("Broken barrier.");
+        }
     }
 }
