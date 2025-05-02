@@ -13,24 +13,23 @@ public class GameOfLife {
 
     public static void main(String[] args) throws Exception {
         parseArgs(args);
-        int maxIterationCount = 100;
+        int maxIterationCount = 1000;
         Board board = createBoard();
         
         // create main task and thread
-        ManagementTask gameOfLifeTask = new ManagementTask(maxIterationCount, board, threadCount, verbose);
-        Thread gameOfLifeThread = new Thread(gameOfLifeTask);
+        TaskManager taskManager = new TaskManager(maxIterationCount, board, threadCount, verbose);
 
         long startTime = System.currentTimeMillis();
 
         // run thread
-        gameOfLifeThread.run();
+        taskManager.run();
 
         long endTime = System.currentTimeMillis();
-        double elapsedTime = (double) (endTime - startTime) / 1000;
+        double elapsedTime = (endTime - startTime) / 1000.;
 
         System.out.println("Threads: " + threadCount);
         System.out.println("Workload: " + dimX * dimY);
-        System.out.printf("Elapsed time: %.6f\n", elapsedTime);
+        System.out.printf("Elapsed time: %.4f\n", elapsedTime);
     }
 
     private static void parseArgs(String[] args) throws Exception {

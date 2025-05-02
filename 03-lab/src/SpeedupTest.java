@@ -1,5 +1,5 @@
 public class SpeedupTest {
-    private static final String[] TASK_SIZE = new String[] {"1000", "10000", "100000", "1000000"};
+    private static final String[] TASK_SIZE = new String[] {"1000", "10000", "100000"};
     private static final String[] THREAD_NUM = new String[] {"1", "2", "4", "8", "16"};
 
     public static void main(String[] args) throws Exception {
