@@ -9,5 +9,3 @@ echo "---"
 java -cp ./bin GameOfLife 16 10000 $THREAD_NUM 0
 echo "---"
 java -cp ./bin GameOfLife 16 100000 $THREAD_NUM 0
-echo "---"
-java -cp ./bin GameOfLife 16 1000000 $THREAD_NUM 0
