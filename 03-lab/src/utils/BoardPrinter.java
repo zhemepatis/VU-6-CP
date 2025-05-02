@@ -1,4 +1,4 @@
-package utils.printers;
+package utils;
 
 import models.*;
 
@@ -20,7 +20,7 @@ public class BoardPrinter {
 
         for (int i = 0; i < y; ++i) {
             for (int j = 0; j < x; ++j) {
-                boolean isActive = board.getCellState(i, j);
+                boolean isActive = board.getCellState(j, i);
                 result += (isActive) ? "+" : ".";
             }
 

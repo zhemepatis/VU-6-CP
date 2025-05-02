@@ -1,32 +1,29 @@
 package tasks;
 
 import models.Board;
-import utils.concurrency.CounterLock;
-import utils.printers.BoardPrinter;
-import utils.wrappers.BooleanWrapper;
 
-public class GameOfLifeTask implements Runnable {
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier; 
+import utils.BoardPrinter;
+
+public class ManagementTask implements Runnable {
     private final int THREAD_COUNT;
     private Thread[] threads;
     private boolean verbose;
 
-    private CounterLock workersDoneLock;
-    private CounterLock procceedCalculationsLock;
+    private CyclicBarrier barrier;
 
     private Board board;
     private int maxIterationCount;
-    private BooleanWrapper gameFinished;
 
-    public GameOfLifeTask(int maxIterationCount, Board board, int threadCount, boolean verbose) {
+    public ManagementTask(int maxIterationCount, Board board, int threadCount, boolean verbose) {
         this.THREAD_COUNT = threadCount;
         this.verbose = verbose;
         
-        this.workersDoneLock = new CounterLock();
-        this.procceedCalculationsLock = new CounterLock();
+        this.barrier = new CyclicBarrier(threadCount + 1);
 
         this.board = board;
         this.maxIterationCount = maxIterationCount;
-        this.gameFinished = new BooleanWrapper(false);
 
         createThreads();
     }
@@ -45,37 +42,23 @@ public class GameOfLifeTask implements Runnable {
 
         // create and run threads
         startThreads();
-        procceedCalculationsLock.advance();
+        awaitThreads();
 
         // game loop
-        while (!gameFinished.value) {
+        while (iteration != maxIterationCount) {
             // wait for all threads to complete their tasks
-            awaitWorkerCompletion(iteration*THREAD_COUNT);
-
-            // check if it's time to end the game
-            boolean hasChanged = board.hasBoardChanged();
-            if (!hasChanged) {
-                gameFinished.value = true;
-
-                procceedCalculationsLock.advance();
-
-                continue;
-            }
+            awaitThreads();
 
             board.applyNextBoard();
 
             // print iteration
             if (verbose) {
-                boardPrinter.printIteration(iteration);
+                boardPrinter.printIteration(iteration + 1);
                 boardPrinter.print();
             }
             ++iteration;
-
-            if (iteration == maxIterationCount) {
-                gameFinished.value = true;
-            }
             
-            procceedCalculationsLock.advance();
+            awaitThreads();
         }
 
         // waiting for all threads to finish their tasks
@@ -88,11 +71,11 @@ public class GameOfLifeTask implements Runnable {
         }
     }
 
-    private void awaitWorkerCompletion(int workerCount) {
+    private void awaitThreads() {
         try {
-            workersDoneLock.await(workerCount);
-        } catch (InterruptedException ex) {
-            System.out.println("Interrupted task completion lock await.");
+            barrier.await();
+        } catch (InterruptedException | BrokenBarrierException ex) {
+            System.out.println("Broken barrier.");
         }
     }
 
@@ -111,7 +94,7 @@ public class GameOfLifeTask implements Runnable {
                 ++endIndex;
             }
 
-            CalculationTask task = new CalculationTask(startIndex, endIndex, board, gameFinished, procceedCalculationsLock, workersDoneLock);
+            CalculationTask task = new CalculationTask(startIndex, endIndex, board, maxIterationCount, barrier);
             threads[i] = new Thread(task);
 
             startIndex = endIndex + 1;

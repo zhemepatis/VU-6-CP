@@ -5,13 +5,12 @@ import java.util.*;
 public class Board extends Grid {
     private boolean[][] currBoard;
     private boolean[][] nextBoard;
-    private boolean hasChanged;
 
     public Board(int x, int y, List<Coordinates> activeCells) {
         super(x, y);
 
-        this.currBoard = new boolean[x][y];
-        this.nextBoard = new boolean[x][y];
+        this.currBoard = new boolean[Y_DIM][X_DIM];
+        this.nextBoard = new boolean[Y_DIM][X_DIM];
 
         initBoard(activeCells);
     }
@@ -70,17 +69,8 @@ public class Board extends Grid {
     }
 
     public void setNextCellState(int x, int y, boolean newState) {
-        boolean currState = getCellState(x, y);
         nextBoard[y][x] = newState;
-
-        if (newState != currState) {
-            hasChanged = true;
-        }
     }
-
-    public boolean hasBoardChanged() {
-        return hasChanged;
-    } 
 
     public boolean calculateNextState(boolean state, int activeNeighborCount) {
         boolean nextState;
@@ -97,7 +87,6 @@ public class Board extends Grid {
 
     public void applyNextBoard() {
         currBoard = nextBoard;
-        nextBoard = new boolean[X_DIM][Y_DIM];
-        hasChanged = false;
+        nextBoard = new boolean[Y_DIM][X_DIM];
     }
 }
