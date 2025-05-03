@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -p main
-#SBATCH -n1
+#SBATCH -n32
 
 WIDTH=32
-THREAD_NUM=1
+THREAD_NUM=32
 
 java -cp ./bin GameOfLife $WIDTH 1000 $THREAD_NUM 0
 echo "---"
