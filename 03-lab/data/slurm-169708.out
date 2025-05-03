@@ -1,0 +1,11 @@
+Threads: 1
+Workload: 32000
+Elapsed time: 2.7300
+---
+Threads: 1
+Workload: 320000
+Elapsed time: 26.9480
+---
+Threads: 1
+Workload: 3200000
+Elapsed time: 212.0770
