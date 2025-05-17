@@ -13,17 +13,13 @@ void calculationTask()
 		MPI_Recv(&work, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
 		if (status.MPI_TAG == DIETAG) {
-			printf("Slave(1): atsiusta baigmes zyme\n");
-			return;
+			break;
 		}
 		else
 		{
-			printf("Slave(2): atsiustas duomuo %d\n", work);
+			// work should be here
 
-			result = work * work;
 			MPI_Send(&result, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-
-			printf("Slave(3): issiustas rezultatas %f\n", result);
 		}
 	}
 }

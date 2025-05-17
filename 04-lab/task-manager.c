@@ -4,15 +4,15 @@
 #include "headers/task-manager.h"
 
 void taskManager() {
-	int	ntasks, rank, work = 0;
+	int	taskNum, rank, work = 0;
 	double result;
 	MPI_Status status;
 
-	MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
+	MPI_Comm_size(MPI_COMM_WORLD, &taskNum);
 
-	for (rank = 1; rank < ntasks; ++rank) 
+	for (rank = 1; rank < taskNum; ++rank) 
 	{
-		work ++;
+		work++;
 		
 		MPI_Send(&work, 1, MPI_INT, rank, WORKTAG, MPI_COMM_WORLD);
 
@@ -20,7 +20,7 @@ void taskManager() {
 	}
 
  	work++;
-	while (work < 100) {
+	while (work < 10) {
 		MPI_Recv(&result, 1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 		
 		printf("Master(2): Is proceso %d gautas duomuo %f\n", status.MPI_SOURCE, result);
@@ -32,14 +32,14 @@ void taskManager() {
 		work++;
 	}
 
-	for (rank = 1; rank < ntasks; ++rank) {
+	for (rank = 1; rank < taskNum; ++rank) {
 		MPI_Recv(&result, 1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
 		printf("Master(4): Is proceso %d gautas duomuo %f\n", status.MPI_SOURCE, result);
 	}
 
-	for (rank = 1; rank < ntasks; ++rank) {
+	// inform all tasks that it's time to stop
+	for (rank = 1; rank < taskNum; ++rank) {
 		MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
-		printf("Master(5): sustabdyti procesa %d\n", rank);
 	}
 }
