@@ -3,6 +3,6 @@
 
     #include "board.h"
 
-    void taskManager(Board board, int totalIterations);
+    void taskManager(Board board, int totalIterations, int verbose);
 
 #endif

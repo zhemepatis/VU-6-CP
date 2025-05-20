@@ -7,15 +7,20 @@
 
 void applyResult(int* result, int start, int end, Board board);
 
-void taskManager(Board board, int totalIterations) {
+void taskManager(Board board, int totalIterations, int verbose) {
 	// MPI variables
 	MPI_Status status;
 	int totalProcesses;
 
 	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
-	printBoard(board);
-	printf("\n");
+	if (verbose) {
+		printf("ITERATION 0\n");
+		printBoard(board);
+
+		// pause until key is entered
+		getchar();
+	}
 
 	// start calculations
 	for (int iteration = 0; iteration < totalIterations; ++iteration) {
@@ -37,8 +42,13 @@ void taskManager(Board board, int totalIterations) {
 			free(result);
 		}
 
-		printBoard(board);
-		printf("\n");
+		if (verbose) {
+			printf("ITERATION %d\n", iteration + 1);
+			printBoard(board);
+
+			// pause until key is entered
+			getchar();
+		}
 	}
 
 	// kill workers
@@ -53,3 +63,4 @@ void applyResult(int* result, int start, int end, Board board) {
 		board.cells[i] = result[i - start];
 	}
 }
+

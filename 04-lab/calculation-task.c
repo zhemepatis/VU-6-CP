@@ -31,8 +31,6 @@ void calculationTask(int start, int end, int width, int height)
 		else {
 			process(board, start, end, result);
 			MPI_Send(result, end - start + 1, MPI_INT, 0, RESULTS_TAG, MPI_COMM_WORLD);
-
-			// TODO: add barrier ? 
 		}
 	}
 

@@ -21,7 +21,17 @@ Board initBoard(int width, int height) {
 void printBoard(Board board) {
 	for(int i = 0; i < board.height; ++i) {
 		for(int j = 0; j < board.width; ++j) {
-			printf("%d ", board.cells[i * board.width + j]);
+			int isActive = board.cells[i * board.width + j];
+
+			if (isActive) {
+				printf("\x1b[34m" "%d " "\x1b[0m", isActive);
+			}
+			else {
+				printf("%d ", isActive);
+
+			}
+
+
 		}
 
 		printf("\n");

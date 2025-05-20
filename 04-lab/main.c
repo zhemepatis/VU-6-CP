@@ -19,10 +19,12 @@ int main(int argc, char* argv[]) {
 	if (processRank == 0) {
 		int x = atoi(argv[1]);
 		int y = atoi(argv[2]);
+		int iterations = 1000;
+		int verbose = atoi(argv[3]);
 
 		Board board = initBoard(x, y);
 
-		taskManager(board, 5);
+		taskManager(board, iterations, verbose);
 
 		freeBoard(board);
 	} 
