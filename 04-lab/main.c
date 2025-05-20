@@ -4,67 +4,39 @@
 #include <time.h>
 #include "headers/task-manager.h"
 #include "headers/calculation-task.h"
-
-int** initBoard(int x, int y);
-void printBoard(int** board, int x, int y);
-void freeBoard(int** board, int x, int y);
+#include "headers/board.h"
 
 int main(int argc, char* argv[]) {
 	srand(time(NULL));
 
-	int rank;
+	int processRank;
+	int totalProcesses;
 
 	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_rank(MPI_COMM_WORLD, &processRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
-	if (rank == 0) {
+	if (processRank == 0) {
 		int x = atoi(argv[1]);
 		int y = atoi(argv[2]);
 
-		int** board = initBoard(x, y);
-		printBoard(board, x, y);
+		Board board = initBoard(x, y);
 
-		taskManager();
+		taskManager(board, 5);
 
-		freeBoard(board, x, y);
+		freeBoard(board);
 	} 
 	else {
-		calculationTask();
+		int width = atoi(argv[1]);
+		int height = atoi(argv[2]);
+		int totalCells = height * width;
+		
+		int partitionStart, partitionEnd;
+		computePartitionBounds(&partitionStart, &partitionEnd, totalCells, processRank, totalProcesses);
+
+		// start calculation task
+		calculationTask(partitionStart, partitionEnd, width, height);
 	}
 
 	MPI_Finalize();
 }
-
-int** initBoard(int x, int y) {
-	int** board = malloc(y * sizeof(int*));
-
-	for(int i = 0; i < y; ++i) {
-		board[i] = malloc(x * sizeof(int));
-
-		for(int j = 0; j < x; ++j) {
-			board[i][j] = rand() % 2;
-		}
-	}
-
-	return board;
-}
-
-void printBoard(int** board, int x, int y) {
-	for(int i = 0; i < y; ++i) {
-		for(int j = 0; j < x; ++j) {
-			printf("%d ", board[i][j]);
-		}
-
-		printf("\n");
-	}
-}
-
-void freeBoard(int** board, int x, int y) {
-	for(int i = 0; i < y; ++i) {
-		free(board[i]);
-	}
-
-	free(board);
-}
-
-

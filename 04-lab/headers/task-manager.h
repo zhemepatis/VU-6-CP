@@ -1,6 +1,8 @@
 #ifndef TASK_MANAGER_H
     #define TASK_MANAGER_H
 
-    void taskManager();
+    #include "board.h"
+
+    void taskManager(Board board, int totalIterations);
 
 #endif
