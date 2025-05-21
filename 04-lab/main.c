@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
 	if (processRank == 0) {
+		double startTime, endTime;
+		startTime = MPI_Wtime();
+
 		int x = atoi(argv[1]);
 		int y = atoi(argv[2]);
 		int iterations = 1000;
@@ -27,6 +30,12 @@ int main(int argc, char* argv[]) {
 		taskManager(board, iterations, verbose);
 
 		freeBoard(board);
+
+		// waiting for other threads to finsh
+		MPI_Barrier(MPI_COMM_WORLD);
+		
+		endTime = MPI_Wtime();
+		printf("Time elapsed: %f\n", endTime - startTime);
 	} 
 	else {
 		int width = atoi(argv[1]);
@@ -38,6 +47,9 @@ int main(int argc, char* argv[]) {
 
 		// start calculation task
 		calculationTask(partitionStart, partitionEnd, width, height);
+
+		// marking that calculation finished
+		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
 	MPI_Finalize();
