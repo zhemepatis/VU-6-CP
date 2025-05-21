@@ -8,6 +8,8 @@ CFLAGS="-Wall -Iheaders"
 OBJ="main.o board.o calculation-task.o task-manager.o"
 TARGET="main"
 
+module --ignore_cache load "openmpi"
+
 # Compile source files into object files
 echo "Compiling source files..."
 $CC $CFLAGS -c main.c -o main.o
