@@ -32,12 +32,15 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
 	// get rows to compute
-	int* grid = NULL;
-	int* sendCounts = NULL;
-	int* offsets = NULL;
-	int firstRow, lastRow, totalRows;
+	int firstRow, lastRow, totalRows, totalCells;
 	computeSplitBounds(&firstRow, &lastRow, height, processRank, totalProcesses);
 	totalRows = lastRow - firstRow + 1;
+	totalCells = totalRows * width;
+
+	// get info for data distribution
+	int* grid = NULL;
+	int* rowsPerProcess = NULL;
+	int* rowStartOffsets = NULL;
 
 	if (processRank == ROOT_RANK) {
 		// initialise grid
@@ -48,26 +51,28 @@ int main(int argc, char* argv[]) {
 		}
 
 		// get split sizes
-		offsets = malloc(totalProcesses * sizeof(int));
-		sendCounts = malloc(totalProcesses * sizeof(int));
+		rowStartOffsets = malloc(totalProcesses * sizeof(int));
+		rowsPerProcess = malloc(totalProcesses * sizeof(int));
 
 		for (int i = 0; i < totalProcesses; ++i) {
 			int tempFirstRow, tempLastRow;
 			computeSplitBounds(&tempFirstRow, &tempLastRow, height, i, totalProcesses);
 			
-			sendCounts[i] = (tempLastRow - tempFirstRow + 1) * width;
-			offsets[i] = tempFirstRow * width;
+			rowsPerProcess[i] = (tempLastRow - tempFirstRow + 1) * width;
+			rowStartOffsets[i] = tempFirstRow * width;
 		}
 	}
 
+	// get expanded board
+
+
 	// braodcast the board
-	int receiveCount = (lastRow - firstRow + 1) * width;
 	int offset = (processRank == 0) ? 0 : width;  
 	int expandedSize = (processRank == 0 || processRank == totalProcesses - 1) ? (totalRows + 1) * width : (totalRows + 2) * width;
 	int* expandedGrid = malloc(expandedSize * sizeof(int));
-	int* resultBuff = malloc(receiveCount * sizeof(int));
+	int* resultBuff = malloc(totalCells * sizeof(int));
 
-	MPI_Scatterv(grid, sendCounts, offsets, MPI_INT, expandedGrid + offset, receiveCount, MPI_INT, ROOT_RANK, MPI_COMM_WORLD);
+	MPI_Scatterv(grid, rowsPerProcess, rowStartOffsets, MPI_INT, expandedGrid + offset, totalCells, MPI_INT, ROOT_RANK, MPI_COMM_WORLD);
 
 	// get buffers for upper & bottom rows
 	int* upperRowBuff = malloc(width * sizeof(int));
@@ -110,7 +115,7 @@ int main(int argc, char* argv[]) {
 		memcpy(expandedGrid + offset, resultBuff, sizeof(int));
 
 		// gather rows
-		
+
 
 		// print iteration
 		if (processRank == ROOT_RANK && verbose == 1) {
@@ -120,8 +125,8 @@ int main(int argc, char* argv[]) {
 
 	// free resources
 	if (processRank == ROOT_RANK) {
-		free(sendCounts);
-		free(offsets);
+		free(rowsPerProcess);
+		free(rowStartOffsets);
 		free(grid);
 	}
 
