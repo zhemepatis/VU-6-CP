@@ -5,7 +5,7 @@
 # compile arguments
 CC=mpicc
 CFLAGS="-Wall -Iheaders"
-TARGET="main"
+TARGET="main.out"
 
 # building project
 module load openmpi
@@ -16,8 +16,8 @@ WIDTH=256
 THREAD_NUM=4
 
 # run experiment
-mpirun -np $THREAD_NUM ./main $WIDTH 100 0
+mpirun -np $THREAD_NUM ./main.out $WIDTH 100 0
 echo "---"
-mpirun -np $THREAD_NUM ./main $WIDTH 1000 0
+mpirun -np $THREAD_NUM ./main.out $WIDTH 1000 0
 echo "---"
-mpirun -np $THREAD_NUM ./main $WIDTH 10000 0
+mpirun -np $THREAD_NUM ./main.out $WIDTH 10000 0

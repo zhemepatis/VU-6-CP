@@ -1,7 +1,7 @@
 CC = mpicc
 CFLAGS = -Wall -Iheaders
 OBJ = main.o
-TARGET = main
+TARGET = main.out
 
 all: $(TARGET)
 
