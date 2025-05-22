@@ -91,13 +91,14 @@ int main(int argc, char* argv[]) {
 		// send upper lines
 		dstRank = (processRank + 1) % totalProcesses;
 		srcRank = processRank == 0 ? totalProcesses - 1 : processRank - 1;
-		MPI_Sendrecv(mainBuff + (totalRows - 1) * width, width, MPI_INT, dstRank, 0,
+		MPI_Sendrecv(mainBuff, width, MPI_INT, dstRank, 0,
 					upperRowBuff, width, MPI_INT, srcRank, 0, 
 					MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 		// send bottom lines
-		swap(&dstRank, &srcRank);
-		MPI_Sendrecv(mainBuff, width, MPI_INT, dstRank, 0,
+		dstRank = processRank == 0 ? totalProcesses - 1 : processRank - 1;
+		srcRank = (processRank + 1) % totalProcesses;
+		MPI_Sendrecv(mainBuff + (totalRows - 1) * width, width, MPI_INT, dstRank, 0,
 					bottomRowBuff, width, MPI_INT, srcRank, 0, 
 					MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
@@ -112,15 +113,19 @@ int main(int argc, char* argv[]) {
 			memcpy(expandedBuff + totalCells + buffCellsOffset, bottomRowBuff, width * sizeof(int));
 		}
 
-		// calculate
-		for (int rowIdx = 0; rowIdx < totalRows; ++rowIdx) {
-			for (int cellIdx = 0; cellIdx < width; ++cellIdx) {
-				int activeNeighbors = countActiveNeighbors(cellIdx, rowIdx, width, totalRows + hasBottomRow, expandedBuff + buffCellsOffset);
+		// printf("rank %d:\n", processRank);
+		// printGrid(expandedBuff, width, totalRows + hasBottomRow + hasUpperRow);
+		// getchar();
 
-				int state = expandedBuff[(buffRowsOffset + rowIdx) * width + cellIdx];
+		// calculate
+		for (int rowIdx = hasUpperRow; rowIdx < (hasUpperRow + totalRows); ++rowIdx) {
+			for (int cellIdx = 0; cellIdx < width; ++cellIdx) {
+				int activeNeighbors = countActiveNeighbors(cellIdx, rowIdx, width, totalRows + hasUpperRow + hasBottomRow, expandedBuff);
+
+				int state = expandedBuff[rowIdx * width + cellIdx];
 				int nextState = getNextCellState(state, activeNeighbors);
 				
-				mainBuff[rowIdx * width + cellIdx] = nextState;
+				mainBuff[(rowIdx - hasUpperRow) * width + cellIdx] = nextState;
 			}
 		}
 
