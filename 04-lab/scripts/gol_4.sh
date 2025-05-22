@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -p main
-#SBATCH -n8
+#SBATCH -n4
 
 # compile arguments
 CC=mpicc
@@ -13,7 +13,7 @@ $CC $CFLAGS -c main.c -o main.o
 
 # experiment arguments
 WIDTH=256
-THREAD_NUM=8
+THREAD_NUM=4
 
 # run experiment
 mpirun -np $THREAD_NUM ./main $WIDTH 100 0
