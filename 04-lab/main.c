@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 	int width = atoi(argv[1]);
 	int height = atoi(argv[2]);
 	int verbose = atoi(argv[3]);
-	int iterations = 10;
+	int iterations = 1000;
 
 	// get MPI arguments
 	int processRank, totalProcesses;
@@ -112,10 +112,6 @@ int main(int argc, char* argv[]) {
 		if (hasBottomRow) {
 			memcpy(expandedBuff + totalCells + buffCellsOffset, bottomRowBuff, width * sizeof(int));
 		}
-
-		// printf("rank %d:\n", processRank);
-		// printGrid(expandedBuff, width, totalRows + hasBottomRow + hasUpperRow);
-		// getchar();
 
 		// calculate
 		for (int rowIdx = hasUpperRow; rowIdx < (hasUpperRow + totalRows); ++rowIdx) {
