@@ -8,7 +8,7 @@ CFLAGS="-Wall -Iheaders"
 TARGET="main"
 
 # building project
-module load "openmpi"
+module load openmpi
 $CC $CFLAGS -c main.c -o main.o
 
 # experiment arguments
@@ -16,7 +16,6 @@ WIDTH=256
 THREAD_NUM=4
 
 # run experiment
-chmod +x ./main
 mpirun -np $THREAD_NUM ./main $WIDTH 100 0
 echo "---"
 mpirun -np $THREAD_NUM ./main $WIDTH 1000 0
