@@ -21,6 +21,17 @@ int main(int argc, char* argv[]) {
 	srand(time(NULL));
 
 	MPI_Init(&argc, &argv);
+	
+	// get MPI arguments
+	int processRank, totalProcesses;
+	MPI_Comm_rank(MPI_COMM_WORLD, &processRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
+
+	// start tracking time
+	double start, end;
+	if (processRank == ROOT_RANK) {
+		start = MPI_Wtime();
+	}
 
 	// get program arguments
 	int width = atoi(argv[1]);
@@ -28,10 +39,6 @@ int main(int argc, char* argv[]) {
 	int verbose = atoi(argv[3]);
 	int iterations = 1000;
 
-	// get MPI arguments
-	int processRank, totalProcesses;
-	MPI_Comm_rank(MPI_COMM_WORLD, &processRank);
-	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
 	// get rows to compute
 	int firstRowIdx, lastRowIdx, totalRows, totalCells;
@@ -141,6 +148,14 @@ int main(int argc, char* argv[]) {
 		free(rowsPerProcess);
 		free(rowStartOffsets);
 		free(grid);
+	}
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	// finish tracking time
+	if (processRank == ROOT_RANK) {
+		end = MPI_Wtime();
+		printf("time elapsed: %f\n", end - start);
 	}
 
 	MPI_Finalize();
