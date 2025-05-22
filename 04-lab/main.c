@@ -2,6 +2,7 @@
 #include <mpi.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define ROOT_RANK 0
 
@@ -14,6 +15,7 @@ void printIteration(int* grid, int width, int height, int iteration);
 int countActiveNeighbors(int x, int y, int width, int height, int* grid);
 int getNextCellState(int state, int activeNeighborCount);
 int isInBounds(int x, int y, int width, int height);
+void swap(int* integer1, int* integer2);
 
 int main(int argc, char* argv[]) {
 	srand(time(NULL));
@@ -32,9 +34,9 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
 	// get rows to compute
-	int firstRow, lastRow, totalRows, totalCells;
-	computeSplitBounds(&firstRow, &lastRow, height, processRank, totalProcesses);
-	totalRows = lastRow - firstRow + 1;
+	int firstRowIdx, lastRowIdx, totalRows, totalCells;
+	computeSplitBounds(&firstRowIdx, &lastRowIdx, height, processRank, totalProcesses);
+	totalRows = lastRowIdx - firstRowIdx + 1;
 	totalCells = totalRows * width;
 
 	// get info for data distribution
@@ -51,8 +53,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		// get split sizes
-		rowStartOffsets = malloc(totalProcesses * sizeof(int));
 		rowsPerProcess = malloc(totalProcesses * sizeof(int));
+		rowStartOffsets = malloc(totalProcesses * sizeof(int));
 
 		for (int i = 0; i < totalProcesses; ++i) {
 			int tempFirstRow, tempLastRow;
@@ -64,17 +66,21 @@ int main(int argc, char* argv[]) {
 	}
 
 	// get expanded board
+	int extraRows = (processRank == 0 || processRank == totalProcesses - 1) ? 1 : 2;
+	int extraCells = extraRows * width;
+	int buffRowsOffset = (processRank == 0) ? 0 : 1;
+	int buffCellsOffset = buffRowsOffset * width;
 
+	int* mainBuff = malloc(totalCells * sizeof(int));
+	int* expandedBuff = malloc((totalCells + extraCells) * sizeof(int));
 
-	// braodcast the board
-	int offset = (processRank == 0) ? 0 : width;  
-	int expandedSize = (processRank == 0 || processRank == totalProcesses - 1) ? (totalRows + 1) * width : (totalRows + 2) * width;
-	int* expandedGrid = malloc(expandedSize * sizeof(int));
-	int* resultBuff = malloc(totalCells * sizeof(int));
-
-	MPI_Scatterv(grid, rowsPerProcess, rowStartOffsets, MPI_INT, expandedGrid + offset, totalCells, MPI_INT, ROOT_RANK, MPI_COMM_WORLD);
+	MPI_Scatterv(grid, rowsPerProcess, rowStartOffsets, MPI_INT, 
+				mainBuff, totalCells, MPI_INT, 
+				ROOT_RANK, MPI_COMM_WORLD);
 
 	// get buffers for upper & bottom rows
+	int hasUpperRow = (processRank == 0) ? 0 : 1;
+	int hasBottomRow = (processRank == totalProcesses - 1) ? 0 : 1;
 	int* upperRowBuff = malloc(width * sizeof(int));
 	int* bottomRowBuff = malloc(width * sizeof(int));
 
@@ -83,39 +89,45 @@ int main(int argc, char* argv[]) {
 	// start calculations
 	for (int iteration = 1; iteration <= iterations; ++iteration) {
 		// send upper lines
-		// TODO: might not work as there is expanded grid now
 		dstRank = (processRank + 1) % totalProcesses;
 		srcRank = processRank == 0 ? totalProcesses - 1 : processRank - 1;
-		MPI_Sendrecv(expandedGrid + (totalRows - 1) * width, width, MPI_INT, dstRank, 0,
+		MPI_Sendrecv(mainBuff + (totalRows - 1) * width, width, MPI_INT, dstRank, 0,
 					upperRowBuff, width, MPI_INT, srcRank, 0, 
 					MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 		// send bottom lines
-		// TODO: might not work as there is expanded grid now
-		dstRank = processRank == 0 ? totalProcesses - 1 : processRank - 1;
-		srcRank = (processRank + 1) % totalProcesses;
-		MPI_Sendrecv(expandedGrid, width, MPI_INT, dstRank, 0,
+		swap(&dstRank, &srcRank);
+		MPI_Sendrecv(mainBuff, width, MPI_INT, dstRank, 0,
 					bottomRowBuff, width, MPI_INT, srcRank, 0, 
 					MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		
-		
+
+		// assemble rows into expanded buffer
+		if (hasUpperRow) {
+			memcpy(expandedBuff, upperRowBuff, width * sizeof(int));
+		}
+
+		memcpy(expandedBuff + buffCellsOffset, mainBuff, totalCells * sizeof(int));
+
+		if (hasBottomRow) {
+			memcpy(expandedBuff + totalCells + buffCellsOffset, bottomRowBuff, width * sizeof(int));
+		}
 
 		// calculate
-		int rowOffset = (offset == 0) ? 0 : 1;
-		for (int rowIdx = rowOffset; rowIdx < totalRows; ++rowIdx) {
+		for (int rowIdx = 0; rowIdx < totalRows; ++rowIdx) {
 			for (int cellIdx = 0; cellIdx < width; ++cellIdx) {
-				int rowLowerBound = (processRank < totalProcesses - 1) ? totalRows + 1: totalRows;
-				int activeNeighbors = countActiveNeighbors(cellIdx, rowIdx, width, rowLowerBound, expandedGrid);
-				int state = expandedGrid[rowIdx * width + cellIdx];
+				int activeNeighbors = countActiveNeighbors(cellIdx, rowIdx, width, totalRows + hasBottomRow, expandedBuff + buffCellsOffset);
+
+				int state = expandedBuff[(buffRowsOffset + rowIdx) * width + cellIdx];
 				int nextState = getNextCellState(state, activeNeighbors);
-				resultBuff[(rowIdx - rowOffset) * width + cellIdx] = nextState;
+				
+				mainBuff[rowIdx * width + cellIdx] = nextState;
 			}
 		}
 
-		memcpy(expandedGrid + offset, resultBuff, sizeof(int));
-
 		// gather rows
-
+    	MPI_Gatherv(mainBuff, totalCells, MPI_INT,
+					grid, rowsPerProcess, rowStartOffsets, MPI_INT,
+					0, MPI_COMM_WORLD);
 
 		// print iteration
 		if (processRank == ROOT_RANK && verbose == 1) {
@@ -129,7 +141,6 @@ int main(int argc, char* argv[]) {
 		free(rowStartOffsets);
 		free(grid);
 	}
-
 
 	MPI_Finalize();
 }
@@ -208,4 +219,10 @@ int getNextCellState(int state, int activeNeighborCount) {
 
 int isInBounds(int x, int y, int width, int height) {
 	return x >= 0 && x < width && y >= 0 && y < height;
+}
+
+void swap(int* integer1, int* integer2) {
+	int temp = *integer1;
+	*integer1 = *integer2;
+	*integer2 = temp;
 }
