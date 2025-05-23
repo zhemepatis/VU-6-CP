@@ -4,5 +4,5 @@
 
 module load openmpi
 
-mpicc -o connectivity connectivity.c
+mpicc -o connectivity tests/connectivity.c
 mpirun ./connectivity
