@@ -7,4 +7,5 @@ TARGET="main"
 
 # building project
 module load openmpi
-$CC $CFLAGS -c main.c -o main.o
+$CC $CFLAGS -c main.c -o main.o  
+$CC main.o -o $TARGET            
