@@ -17,6 +17,8 @@ WIDTH=256
 THREAD_NUM=256
 
 # run experiment
+echo "Running with $THREAD_NUM thread(s)"
+
 mpirun -np $THREAD_NUM ./main $WIDTH 100 0
 echo "---"
 mpirun -np $THREAD_NUM ./main $WIDTH 1000 0
