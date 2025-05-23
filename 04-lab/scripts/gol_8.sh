@@ -7,9 +7,10 @@ CC=mpicc
 CFLAGS="-Wall -Iheaders"
 TARGET="main"
 
-# building project
-module load "openmpi"
-$CC $CFLAGS -c main.c -o main.o
+# build project
+module load openmpi
+$CC $CFLAGS -c main.c -o main.o  
+$CC main.o -o $TARGET
 
 # experiment arguments
 WIDTH=256
