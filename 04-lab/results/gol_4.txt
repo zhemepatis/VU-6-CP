@@ -1,0 +1,6 @@
+Running with 4 thread(s)
+time elapsed: 0.444446
+---
+time elapsed: 4.567872
+---
+time elapsed: 48.095340
